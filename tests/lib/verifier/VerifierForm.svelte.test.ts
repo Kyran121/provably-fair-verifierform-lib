@@ -1,0 +1,350 @@
+import { fireEvent, render, screen } from '@testing-library/svelte';
+import { describe, test, expect, vi, beforeEach, afterEach, type Mock } from 'vitest';
+import VerifierForm from '$lib/verifier/VerifierForm.svelte';
+import TestResult from './DummyResultForTest.svelte';
+import TestExplanation from './DummyExplanationForTest.svelte';
+import userEvent from '@testing-library/user-event';
+import type { AfterNavigate } from '@sveltejs/kit';
+import { tick } from 'svelte';
+import type { Control } from '../../../src/lib/verifier/types';
+
+// Use vi.hoisted to define variables accessible in the mock factory
+const {
+	gotoSpy,
+	afterNavigateCallbackRef,
+	pageStateRef
+}: {
+	gotoSpy: Mock;
+	afterNavigateCallbackRef: {
+		current: ((navigation: AfterNavigate) => void) | null;
+	};
+	pageStateRef: {
+		current: { url: URL | null };
+	};
+} = vi.hoisted(() => {
+	return {
+		gotoSpy: vi.fn(),
+		afterNavigateCallbackRef: { current: null },
+		pageStateRef: { current: { url: null } }
+	};
+});
+
+// Mock $app/navigation
+vi.mock('$app/navigation', () => ({
+	goto: gotoSpy,
+	afterNavigate: (fn: any) => {
+		afterNavigateCallbackRef.current = fn;
+	}
+}));
+
+// Mock $app/state
+vi.mock('$app/state', () => {
+	const page = {
+		url: new URL('http://localhost:8080/?game=dice&clientseed=123&serverseed=456&nonce=0')
+	};
+	pageStateRef.current = page;
+	return { page };
+});
+
+const COMMON_CONTROLS: Control[] = [
+	{
+		id: 'clientseed',
+		name: 'clientseed',
+		label: 'Client Seed',
+		type: 'text',
+		required: true
+	},
+	{
+		id: 'serverseed',
+		name: 'serverseed',
+		label: 'Server Seed',
+		type: 'text',
+		required: true
+	},
+	{
+		id: 'nonce',
+		name: 'nonce',
+		label: 'Nonce',
+		type: 'number',
+		required: true
+	}
+];
+
+describe('VerifierForm Component', () => {
+	beforeEach(async () => {
+		vi.useFakeTimers();
+
+		pageStateRef.current.url = new URL(
+			new URL('http://localhost:8080/?game=dice&clientseed=123&serverseed=456&nonce=0')
+		);
+	});
+
+	afterEach(() => {
+		vi.useRealTimers();
+	});
+
+	describe('url query param <-> state binding', () => {
+		test('url query params are loaded into state', async () => {
+			setupVerifierForm();
+
+			const game = screen.getByLabelText(/Select Game:/);
+			expect(game).toHaveValue('dice');
+
+			const clientSeed = screen.getByLabelText(/Client Seed\*/);
+			expect(clientSeed).toHaveValue('123');
+
+			const serverSeed = screen.getByLabelText(/Server Seed\*/);
+			expect(serverSeed).toHaveValue('456');
+
+			const nonce = screen.getByLabelText(/Nonce\*/);
+			expect(nonce).toHaveValue(0);
+		});
+
+		test('url query params are loaded into state (different game)', async () => {
+			pageStateRef.current.url = new URL(
+				'http://localhost:8080/?game=roulette&clientseed=123&serverseed=456&nonce=0'
+			);
+
+			setupVerifierForm();
+
+			const game = screen.getByLabelText(/Select Game:/);
+			expect(game).toHaveValue('roulette');
+
+			const clientSeed = screen.getByLabelText(/Client Seed\*/);
+			expect(clientSeed).toHaveValue('123');
+
+			const serverSeed = screen.getByLabelText(/Server Seed\*/);
+			expect(serverSeed).toHaveValue('456');
+
+			const nonce = screen.getByLabelText(/Nonce\*/);
+			expect(nonce).toHaveValue(0);
+		});
+
+		test('state changes propagate to url query params', async () => {
+			setupVerifierForm();
+
+			const game = screen.getByLabelText(/Select Game:/);
+			expect(game).toHaveValue('dice');
+
+			const clientSeed = screen.getByLabelText(/Client Seed\*/);
+			await fireEvent.input(clientSeed, { target: { value: 'abc' } });
+
+			const serverSeed = screen.getByLabelText(/Server Seed\*/);
+			await fireEvent.input(serverSeed, { target: { value: 'bcd' } });
+
+			const nonce = screen.getByLabelText(/Nonce\*/);
+			await fireEvent.input(nonce, { target: { value: 2 } });
+
+			await vi.advanceTimersByTimeAsync(350);
+
+			expect(gotoSpy).toHaveBeenCalledOnce();
+
+			const [urlArg] = gotoSpy.mock.calls[0];
+			expect(urlArg).toContain('game=dice');
+			expect(urlArg).toContain('clientseed=abc');
+			expect(urlArg).toContain('serverseed=bcd');
+			expect(urlArg).toContain('nonce=2');
+		});
+
+		test('url query param changes propagate to state', async () => {
+			setupVerifierForm();
+
+			await navigateTo(
+				new URL('http://localhost:8080/?game=dice&clientseed=999&serverseed=012&nonce=5')
+			);
+
+			const game = screen.getByLabelText(/Select Game:/);
+			expect(game).toHaveValue('dice');
+
+			const clientSeed = screen.getByLabelText(/Client Seed\*/);
+			expect(clientSeed).toHaveValue('999');
+
+			const serverSeed = screen.getByLabelText(/Server Seed\*/);
+			expect(serverSeed).toHaveValue('012');
+
+			const nonce = screen.getByLabelText(/Nonce\*/);
+			expect(nonce).toHaveValue(5);
+		});
+	});
+
+	test('result is shown when all required fields are filled and explanation is toggleable', async () => {
+		const { user } = setupVerifierForm();
+
+		const clientSeed = screen.getByLabelText(/Client Seed\*/);
+		await user.clear(clientSeed);
+		await user.type(clientSeed, 'aaa');
+
+		const serverSeed = screen.getByLabelText(/Server Seed\*/);
+		await user.clear(serverSeed);
+		await user.type(serverSeed, 'bbb');
+
+		const nonce = screen.getByLabelText(/Nonce\*/);
+		await user.clear(nonce);
+		await user.type(nonce, '123');
+
+		await vi.advanceTimersByTimeAsync(350);
+
+		expect(
+			await screen.findByText('Result for clientSeed=aaa serverSeed=bbb nonce=123')
+		).toBeInTheDocument();
+
+		expect(screen.queryByText('Explanation for')).not.toBeInTheDocument();
+
+		const explanationBtn = screen.getByText('Show Explanation');
+		await user.click(explanationBtn);
+
+		expect(explanationBtn).toHaveTextContent('Hide Explanation');
+		expect(
+			await screen.findByText('Explanation for clientSeed=aaa serverSeed=bbb nonce=123')
+		).toBeInTheDocument();
+	});
+
+	test('optional fields are passed to result and explanation', async () => {
+		const { user } = setupVerifierForm();
+
+		const clientSeed = screen.getByLabelText(/Client Seed\*/);
+		await user.clear(clientSeed);
+		await user.type(clientSeed, 'aaa1');
+
+		const serverSeed = screen.getByLabelText(/Server Seed\*/);
+		await user.clear(serverSeed);
+		await user.type(serverSeed, 'bbb2');
+
+		const nonce = screen.getByLabelText(/Nonce\*/);
+		await user.clear(nonce);
+		await user.type(nonce, '1234');
+
+		const optional = screen.getByLabelText(/Optional/);
+		await user.clear(optional);
+		await user.type(optional, 'yes1');
+
+		await vi.advanceTimersByTimeAsync(350);
+
+		expect(
+			await screen.findByText('Result for clientSeed=aaa1 serverSeed=bbb2 nonce=1234 optional=yes1')
+		).toBeInTheDocument();
+
+		const explanationBtn = screen.getByText('Show Explanation');
+		await user.click(explanationBtn);
+
+		expect(explanationBtn).toHaveTextContent('Hide Explanation');
+		expect(
+			await screen.findByText(
+				'Explanation for clientSeed=aaa1 serverSeed=bbb2 nonce=1234 optional=yes1'
+			)
+		).toBeInTheDocument();
+	});
+
+	test('game change resets input fields', async () => {
+		const { user } = setupVerifierForm();
+
+		const clientSeed = screen.getByLabelText(/Client Seed\*/);
+		await user.clear(clientSeed);
+		await user.type(clientSeed, 'aaa');
+
+		const serverSeed = screen.getByLabelText(/Server Seed\*/);
+		await user.clear(serverSeed);
+		await user.type(serverSeed, 'bbb');
+
+		const nonce = screen.getByLabelText(/Nonce\*/);
+		await user.clear(nonce);
+		await user.type(nonce, '123');
+
+		const optional = screen.getByLabelText(/Optional/);
+		await user.clear(optional);
+		await user.type(optional, 'yes');
+
+		const game = screen.getByLabelText(/Select Game:/);
+		await user.selectOptions(game, 'roulette');
+
+		expect(gotoSpy).toHaveBeenCalledOnce();
+		const [urlArg] = gotoSpy.mock.calls[0];
+		expect(urlArg).toBe('?game=roulette');
+
+		await navigateTo(new URL('http://localhost:8080/?game=roulette'));
+
+		expect(game).toHaveValue('roulette');
+		expect(clientSeed).toHaveValue('');
+		expect(serverSeed).toHaveValue('');
+		expect(nonce).toHaveValue(null);
+		expect(optional).not.toBeInTheDocument();
+	});
+
+	test('invalid game causes redirect to first game in dropdown', async () => {
+		setupVerifierForm();
+
+		await navigateTo(new URL('http://localhost:8080/?game=invalid'));
+
+		expect(gotoSpy).toHaveBeenCalledOnce();
+		const [urlArg] = gotoSpy.mock.calls[0];
+		expect(urlArg).toBe('?game=dice');
+	});
+
+	test('empty params are removed from url', async () => {
+		setupVerifierForm();
+
+		await navigateTo(new URL('http://localhost:8080/?game=dice&clientseed=&nonce=null'));
+
+		expect(gotoSpy).toHaveBeenCalledOnce();
+		const [urlArg] = gotoSpy.mock.calls[0];
+		expect(urlArg).toBe('?game=dice');
+	});
+
+	function setupVerifierForm() {
+		const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
+		render(VerifierForm, {
+			props: {
+				games: {
+					dice: {
+						name: 'dice',
+						controls: [
+							...COMMON_CONTROLS,
+							{
+								id: 'optional',
+								name: 'optional',
+								label: 'Optional',
+								type: 'text',
+								required: false
+							}
+						],
+						ResultComponent: TestResult,
+						ExplanationComponent: TestExplanation
+					},
+					roulette: {
+						name: 'roulette',
+						controls: COMMON_CONTROLS,
+						ResultComponent: TestResult,
+						ExplanationComponent: TestExplanation
+					}
+				}
+			}
+		});
+		return { user };
+	}
+
+	async function navigateTo(newUrl: URL) {
+		// simulate URL change
+		pageStateRef.current.url = newUrl;
+
+		// Trigger the afterNavigate callback manually
+		afterNavigateCallbackRef &&
+			afterNavigateCallbackRef.current?.({
+				from: {
+					url: new URL('http://localhost:8080/?game=dice&clientseed=123&serverseed=456'),
+					route: { id: null },
+					params: null
+				},
+				to: {
+					url: newUrl,
+					route: { id: null },
+					params: null
+				},
+				willUnload: false,
+				type: 'link',
+				complete: Promise.resolve()
+			});
+
+		await tick();
+		await vi.advanceTimersByTimeAsync(350);
+	}
+});
