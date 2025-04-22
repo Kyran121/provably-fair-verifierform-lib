@@ -74,14 +74,14 @@ Each game must define:
 
 ```ts
 const diceGame: GameDefinition = {
-	name: 'Dice',
-	controls: [
-		{ id: 'clientseed', label: 'Client Seed', type: 'text', required: true },
-		{ id: 'serverseed', label: 'Server Seed', type: 'text', required: true },
-		{ id: 'nonce', label: 'Nonce', type: 'number', required: true }
-	],
-	ResultComponent: DiceResult,
-	ExplanationComponent: DiceExplanation
+  name: 'Dice',
+  controls: [
+    { id: 'clientseed', label: 'Client Seed', type: 'text', required: true },
+    { id: 'serverseed', label: 'Server Seed', type: 'text', required: true },
+    { id: 'nonce', label: 'Nonce', type: 'number', required: true }
+  ],
+  ResultComponent: DiceResult,
+  ExplanationComponent: DiceExplanation
 };
 ```
 
