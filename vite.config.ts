@@ -31,7 +31,7 @@ export default defineConfig({
     ],
     coverage: {
       enabled: true,
-      reporter: ['html'],
+      reporter: ['html', 'json-summary'],
       include: ['**/src/lib/verifier/**']
     }
   }
