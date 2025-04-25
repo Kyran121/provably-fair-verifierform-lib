@@ -23,6 +23,10 @@ jobs:
         with:
           node-version: '20'
 
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
       - name: Install dependencies
         run: pnpm i
 
@@ -35,16 +39,32 @@ jobs:
       - name: Run E2E Tests
         run: npm run test:e2e
 
-      - name: Generate Coverage Badge
-        uses: wjervis7/vitest-badge-action@v1
+      - name: Generate Lines Coverage Badge
+        uses: wjervis7/vitest-badge-action@v1.0.0
         with:
+          result-type: lines
           summary-path: coverage/coverage-summary.json
-          badge-path: coverage/badge.svg
+          badge-path: coverage/lines-badge.svg
           vitest-config-path: vite.config.ts
           upload-badge: false
 
-      - name: Upload Coverage Badge Artifact
+      - name: Generate Branches Coverage Badge
+        uses: wjervis7/vitest-badge-action@v1.0.0
+        with:
+          result-type: branches
+          summary-path: coverage/coverage-summary.json
+          badge-path: coverage/branches-badge.svg
+          vitest-config-path: vite.config.ts
+          upload-badge: false
+
+      - name: Upload Lines Coverage Badge Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: coverage-badge
-          path: coverage/badge.svg
+          name: coverage-badge-lines
+          path: coverage/lines-badge.svg
+
+      - name: Upload Branches Coverage Badge Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-badge-branches
+          path: coverage/branches-badge.svg
