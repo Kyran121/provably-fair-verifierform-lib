@@ -1,5 +1,5 @@
 <script lang="ts">
-  const { formValues }: { formValues: Record<string, any> } = $props();
+  const { formValues }: { formValues: Record<string, unknown> } = $props();
 </script>
 
 <p id="dummy-result">

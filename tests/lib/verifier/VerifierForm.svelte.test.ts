@@ -32,7 +32,7 @@ const {
 // Mock $app/navigation
 vi.mock('$app/navigation', () => ({
   goto: gotoSpy,
-  afterNavigate: (fn: any) => {
+  afterNavigate: (fn: (navigation: AfterNavigate) => void) => {
     afterNavigateCallbackRef.current = fn;
   }
 }));
@@ -327,22 +327,21 @@ describe('VerifierForm Component', () => {
     pageStateRef.current.url = newUrl;
 
     // Trigger the afterNavigate callback manually
-    afterNavigateCallbackRef &&
-      afterNavigateCallbackRef.current?.({
-        from: {
-          url: new URL('http://localhost:8080/?game=dice&clientseed=123&serverseed=456'),
-          route: { id: null },
-          params: null
-        },
-        to: {
-          url: newUrl,
-          route: { id: null },
-          params: null
-        },
-        willUnload: false,
-        type: 'link',
-        complete: Promise.resolve()
-      });
+    afterNavigateCallbackRef?.current?.({
+      from: {
+        url: new URL('http://localhost:8080/?game=dice&clientseed=123&serverseed=456'),
+        route: { id: null },
+        params: null
+      },
+      to: {
+        url: newUrl,
+        route: { id: null },
+        params: null
+      },
+      willUnload: false,
+      type: 'link',
+      complete: Promise.resolve()
+    });
 
     await tick();
     await vi.advanceTimersByTimeAsync(350);

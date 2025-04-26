@@ -22,7 +22,7 @@
       aria-invalid={violation}
       {...violation && { 'aria-errormessage': `${control.id}-error-message` }}
     >
-      {#each control.options as opt}
+      {#each control.options as opt (opt.value)}
         <option value={opt.value}>{opt.label}</option>
       {/each}
     </select>

@@ -3,6 +3,7 @@
 
   import { page } from '$app/state';
   import { goto, afterNavigate } from '$app/navigation';
+  import type { Control as TControl } from '$lib/verifier/types';
   import Control from './Control.svelte';
 
   let { games }: { games: Record<string, GameDefinition> } = $props();
@@ -11,9 +12,11 @@
   let changeTimeout: number | undefined = undefined;
 
   // 1. Initialize state from URL query params
-  let formValues = $state<Record<string, any>>(Object.fromEntries(page.url.searchParams.entries()));
+  let formValues = $state<Record<string, string | number | null>>(
+    Object.fromEntries(page.url.searchParams.entries())
+  );
 
-  let game = $derived(formValues.game);
+  let game = $derived(formValues.game as string);
   let controls = $derived(games[game]?.controls);
   let Result = $derived(games[game]?.ResultComponent);
   let Explanation = $derived(games[game]?.ExplanationComponent);
@@ -24,7 +27,7 @@
         acc[control.id] = control;
         return acc;
       },
-      {} as Record<string, any>
+      {} as Record<string, TControl>
     )
   );
 
@@ -39,7 +42,7 @@
     // check for control change
     if (game && game in games && game === page.url.searchParams.get('game')) {
       const qs = new URLSearchParams(
-        Object.entries(formValues).filter(([, v]) => v !== null)
+        Object.entries(formValues).filter(([, v]) => v !== null) as string[][]
       ).toString();
 
       if (qs !== page.url.searchParams.toString()) {
@@ -119,7 +122,7 @@
       onchange={handleGameChange}
       class="block w-full border-0 border-b-2 bg-transparent p-2 focus:ring-0 focus:outline-none dark:text-white"
     >
-      {#each Object.entries(games) as [gameId, gameDef]}
+      {#each Object.entries(games) as [gameId, gameDef] (gameId)}
         <option value={gameId} {...game === gameId ? { selected: true } : {}}>{gameDef.name}</option
         >
       {/each}
@@ -128,8 +131,8 @@
 
   <!-- Dynamic Form Controls -->
   <div class="mb-6 space-y-3">
-    {#each controls as control}
-      <Control {control} bind:value={formValues[control.id]} />
+    {#each controls as control (control.id)}
+      <Control {control} bind:value={formValues[control.id] as string} />
     {/each}
   </div>
 

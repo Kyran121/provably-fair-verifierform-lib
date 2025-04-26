@@ -9,12 +9,12 @@ export interface Control {
   type: ControlType;
   required: boolean;
   options?: { label: string; value: string }[];
-  attrs?: Record<string, any>;
+  attrs?: Record<string, unknown>;
 }
 
 export interface GameDefinition {
   name: string;
   controls: Control[];
-  ResultComponent: Component<{ formValues: Record<string, any> }>;
-  ExplanationComponent?: Component<{ formValues: Record<string, any> }>;
+  ResultComponent: Component<{ formValues: Record<string, unknown> }>;
+  ExplanationComponent?: Component<{ formValues: Record<string, unknown> }>;
 }
