@@ -45,6 +45,7 @@ jobs:
           result-type: lines
           summary-path: coverage/coverage-summary.json
           badge-path: coverage/lines-badge.svg
+          badge-text: 'Lines Coverage'
           vitest-config-path: vite.config.ts
           upload-badge: false
 
@@ -54,6 +55,7 @@ jobs:
           result-type: branches
           summary-path: coverage/coverage-summary.json
           badge-path: coverage/branches-badge.svg
+          badge-text: 'Branches Coverage'
           vitest-config-path: vite.config.ts
           upload-badge: false
 
