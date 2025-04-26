@@ -44,20 +44,22 @@ jobs:
         with:
           result-type: lines
           summary-path: coverage/coverage-summary.json
-          badge-path: coverage/lines-badge.svg
+          badge-path: lines-badge.svg
           badge-text: 'Lines Coverage'
           vitest-config-path: vite.config.ts
-          upload-badge: false
+          gist-token: ${{ secrets.GIST_TOKEN }}
+          gist-url: https://gist.github.com/Kyran121/3297558a26163acee4e360d24d9ea776
 
       - name: Generate Branches Coverage Badge
         uses: wjervis7/vitest-badge-action@v1.0.0
         with:
           result-type: branches
           summary-path: coverage/coverage-summary.json
-          badge-path: coverage/branches-badge.svg
+          badge-path: branches-badge.svg
           badge-text: 'Branches Coverage'
           vitest-config-path: vite.config.ts
-          upload-badge: false
+          gist-token: ${{ secrets.GIST_TOKEN }}
+          gist-url: https://gist.github.com/Kyran121/3297558a26163acee4e360d24d9ea776
 
       - name: Upload Lines Coverage Badge Artifact
         uses: actions/upload-artifact@v4
