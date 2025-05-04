@@ -42,7 +42,7 @@
     // check for control change
     if (game && game in games && game === page.url.searchParams.get('game')) {
       const qs = new URLSearchParams(
-        Object.entries(formValues).filter(([, v]) => v !== null) as string[][]
+        Object.entries(formValues) as string[][]
       ).toString();
 
       if (qs !== page.url.searchParams.toString()) {
@@ -75,15 +75,18 @@
     for (const [key, val] of page.url.searchParams.entries()) {
       if (formValues[key] !== val) {
         if (controlsMap[key].type === 'number') {
-          formValues[key] = val === 'null' ? null : parseInt(val);
+          // parse number if control is a number
+          if (formValues[key] !== null) {
+            formValues[key] = parseInt(val);
+          }
         } else {
-          formValues[key] = val === '' ? null : val;
+          formValues[key] = val;
         }
       }
     }
     // Remove keys no longer in URL or which are null/empty
     for (const key of Object.keys(formValues)) {
-      if (!page.url.searchParams.has(key) || formValues[key] === null) {
+      if (!page.url.searchParams.has(key) || formValues[key] === null || formValues[key] === '') {
         delete formValues[key];
       }
     }

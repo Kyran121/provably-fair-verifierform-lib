@@ -283,7 +283,7 @@ describe('VerifierForm Component', () => {
   test('empty params are removed from url', async () => {
     setupVerifierForm();
 
-    await navigateTo(new URL('http://localhost:8080/?game=dice&clientseed=&nonce=null'));
+    await navigateTo(new URL('http://localhost:8080/?game=dice&clientseed='));
 
     expect(gotoSpy).toHaveBeenCalledOnce();
     const [urlArg] = gotoSpy.mock.calls[0];
