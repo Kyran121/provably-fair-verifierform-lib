@@ -41,9 +41,7 @@
 
     // check for control change
     if (game && game in games && game === page.url.searchParams.get('game')) {
-      const qs = new URLSearchParams(
-        Object.entries(formValues) as string[][]
-      ).toString();
+      const qs = new URLSearchParams(Object.entries(formValues) as string[][]).toString();
 
       if (qs !== page.url.searchParams.toString()) {
         showExplanation = false;
@@ -152,7 +150,7 @@
       >
         {showExplanation ? 'Hide Explanation' : 'Show Explanation'}
       </button>
-      <div class={["mt-4 dark:text-white", showExplanation ? '' : 'hidden']}>
+      <div class={['mt-4 dark:text-white', showExplanation ? '' : 'hidden']}>
         <Explanation {formValues} />
       </div>
     {/if}
