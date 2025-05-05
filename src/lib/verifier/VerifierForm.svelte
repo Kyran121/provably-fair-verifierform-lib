@@ -121,7 +121,7 @@
     <select
       id="game"
       onchange={handleGameChange}
-      class="block w-full border-0 border-b-2 bg-transparent p-2 focus:ring-0 focus:outline-none dark:text-white"
+      class="block w-full border-0 border-b-1 bg-transparent p-2 focus:ring-0 focus:outline-none dark:text-white"
     >
       {#each Object.entries(games) as [gameId, gameDef] (gameId)}
         <option value={gameId} {...game === gameId ? { selected: true } : {}}>{gameDef.name}</option
