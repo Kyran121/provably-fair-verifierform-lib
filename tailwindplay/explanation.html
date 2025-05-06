@@ -1,0 +1,157 @@
+<div class="mx-auto max-w-xl rounded-b-lg p-4 dark:bg-gray-800">
+  <div class="mb-7">
+    <label for="game" class="mb-1 block font-semibold text-black dark:text-white">Select Game:</label>
+    <select id="game" class="block w-full border-0 border-b-2 bg-transparent p-2 focus:ring-0 focus:outline-none dark:text-white">
+      <!--[-->
+      <option value="dice" selected="">Dice</option>
+      <!--]-->
+    </select>
+  </div>
+  <div class="mb-6 space-y-3">
+    <!--[-->
+    <div class="group relative z-0 mb-5 w-full">
+      <!--[!--><input id="clientseed" name="clientseed" type="text" required="" class="text-md dark:border-gray-60 peer block w-full appearance-none border-0 border-b-1 border-gray-300 bg-transparent px-0 py-2.5 text-gray-900 focus:border-blue-600 focus:ring-0 focus:outline-none dark:text-white dark:focus:border-blue-500" placeholder="" autocomplete="off" aria-invalid="false" /><!--]-->
+      <label for="clientseed" class="absolute top-3 -z-10 origin-[0] -translate-y-6 scale-90 transform text-sm text-gray-500 duration-300 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-100 peer-focus:start-0 peer-focus:-translate-y-6 peer-focus:scale-100 peer-focus:font-medium peer-focus:text-blue-600 rtl:peer-focus:translate-x-1/4 dark:text-gray-400 peer-focus:dark:text-blue-500">Client Seed*</label>
+      <!--[!--><!--]-->
+    </div>
+    <!---->
+    <div class="group relative z-0 mb-5 w-full">
+      <!--[!--><input id="serverseed" name="serverseed" type="text" required="" class="text-md dark:border-gray-60 peer block w-full appearance-none border-0 border-b-1 border-gray-300 bg-transparent px-0 py-2.5 text-gray-900 focus:border-blue-600 focus:ring-0 focus:outline-none dark:text-white dark:focus:border-blue-500" placeholder="" autocomplete="off" aria-invalid="false" /><!--]-->
+      <label for="serverseed" class="absolute top-3 -z-10 origin-[0] -translate-y-6 scale-90 transform text-sm text-gray-500 duration-300 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-100 peer-focus:start-0 peer-focus:-translate-y-6 peer-focus:scale-100 peer-focus:font-medium peer-focus:text-blue-600 rtl:peer-focus:translate-x-1/4 dark:text-gray-400 peer-focus:dark:text-blue-500">Server Seed*</label>
+      <!--[!--><!--]-->
+    </div>
+    <!---->
+    <div class="group relative z-0 mb-5 w-full">
+      <!--[!--><input id="nonce" name="nonce" type="number" required="" class="text-md dark:border-gray-60 peer block w-full appearance-none border-0 border-b-1 border-gray-300 bg-transparent px-0 py-2.5 text-gray-900 focus:border-blue-600 focus:ring-0 focus:outline-none dark:text-white dark:focus:border-blue-500" placeholder="" autocomplete="off" aria-invalid="false" min="0" /><!--]-->
+      <label for="nonce" class="absolute top-3 -z-10 origin-[0] -translate-y-6 scale-90 transform text-sm text-gray-500 duration-300 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-100 peer-focus:start-0 peer-focus:-translate-y-6 peer-focus:scale-100 peer-focus:font-medium peer-focus:text-blue-600 rtl:peer-focus:translate-x-1/4 dark:text-gray-400 peer-focus:dark:text-blue-500">Nonce*</label>
+      <!--[!--><!--]-->
+    </div>
+    <!----><!--]-->
+  </div>
+  <!--[-->
+  <div class="mb-4 rounded dark:text-white">
+    <!----><!--[-->
+    <p data-testid="dice-result" class="text-center text-base">you rolled a <span class="text-xl text-blue-500">96.90</span></p>
+    <!--]--><!---->
+  </div>
+  <!--[--><button class="m-auto block bg-blue-700 px-5 py-2.5 text-sm font-medium text-white hover:bg-blue-800 focus:ring-0 focus:ring-blue-300 focus:outline-none dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Hide Explanation</button>
+  <!--[!-->
+  <div class="mt-10 dark:text-white">
+    <!---->
+    <div class="border-0 text-center">
+      <div class="mt-4 flex flex-col gap-1">
+        <ul class="flex overflow-x-auto pb-4 font-mono" data-tabs-toggle="#step-content" role="tablist">
+          <li class="me-2" role="presentation"><button class="mr-2 inline-block bg-blue-700 px-5 py-2.5 text-sm font-medium text-white hover:bg-blue-800 focus:ring-0 focus:ring-blue-300 focus:outline-none dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" role="tab" id="float-0-tab" data-tabs-target="#float-0" aria-controls="float-0" aria-selected="true">(1) 96.90</button></li>
+        </ul>
+      </div>
+      <div id="step-content" class="mt-2 pt-4 pb-4 text-left text-sm dark:bg-gray-800 dark:text-white">
+        <div>
+          <p class="mb-2 text-xl">Step 1</p>
+          <p class="text-base">Extract float based on client seed, server seed, and nonce</p>
+          <p class="mb-7 text-sm text-gray-500">Refer to scripts on the</p>
+
+          <div class="font-mono text-gray-500">
+            <p>resultIndex = 0</p>
+            <p>hexCharsInHmac = 64</p>
+            <p>hexCharsForFloat = 8<p>
+
+            <p class="mt-4">round</p>
+            <p>= <span class="font-bold text-blue-500">&lbrace;resultIndex}</span> / <span class="font-bold text-blue-500">{hexCharsForFloat}</span></p>
+            <p>= <span class="font-bold text-blue-500">0</span> / <span class="font-bold text-blue-500">8</span></p>
+            <p>= 0</span>
+
+            <p class="mt-4">cursor</p>
+            <p>= (<span class="font-bold text-blue-500">{resultIndex}</span> * <span class="font-bold text-blue-500">{hexCharsForFloat}</span>) % <span class="font-bold text-blue-500">{hexCharsInHmac}</span></p>
+            <p>= (<span class="font-bold text-blue-500">0</span> * <span class="font-bold text-blue-500">8</span>) % <span class="font-bold text-blue-500">64</span></span>
+            <p>= 0</p>
+
+            <p class="mt-4">hmac</p>
+            <p>= hmac_sha256(</p>
+            <p class="indent-8">key &nbsp;= <span class="font-bold text-blue-500">{serverseed}</span></p>
+            <p class="indent-8">data = <span class="font-bold text-blue-500">{clientseed}:{nonce}:{round}</span></p>
+            <p class="indent-4">)</p>
+            <p>= hmac_sha256(</p>
+            <p class="indent-8">key &nbsp;= <span class="font-bold text-blue-500">456</span></p>
+            <p class="indent-8">data = <span class="font-bold text-blue-500">123:0:0</span></p>
+            <p class="indent-4">)</p>
+            <p class="break-all">= <span class="text-xs">f80ad819e613b0074625d501c6ea6ac480a5eed83a0cd0d3e87af2406de89b34</span></p>
+
+            <p class="mt-4">hexes</p>
+            <p>= substring(</p>
+            <p class="indent-8">value = <span class="font-bold text-blue-500">{hmac}</span></p>
+            <p class="indent-8">start = <span class="font-bold text-blue-500">{cursor}</span></p>
+            <p class="indent-8">take &nbsp;= <span class="font-bold text-blue-500">{hexCharsForFloat}</span></p>
+            <p class="indent-4">)</p>
+            <p>= substring(</p>
+            <p class="indent-8 truncate">value = <span class="font-bold text-blue-500">f80ad819e613b0074625d501c6ea6ac480a5eed83a0cd0d3e87af2406de89b34</span></p>
+            <p class="indent-8">start = <span class="font-bold text-blue-500">0</span></p>
+            <p class="indent-8">take &nbsp;= <span class="font-bold text-blue-500">8</span></p>
+            <p class="indent-4">)</p>
+            <p class="break-all">= <span class="font-bold text-blue-500">f80ad819</span><span class="text-xs text-gray-400">e613b0074625d501c6ea6ac480a5eed83a0cd0d3e87af2406de89b34</span></p>   
+          </div>
+          <div class="relative mt-4 overflow-x-auto">
+            <table class="w-full text-left text-sm text-gray-500 rtl:text-right dark:text-gray-400">
+              <tbody>
+                <tr class="border-b border-gray-200 bg-white dark:border-gray-700">
+                  <th scope="row" class="px-6 py-4 font-medium whitespace-nowrap text-gray-900 dark:text-white">hex</th>
+                  <td class="px-6 py-4 font-mono">f8</td>
+                  <td class="px-6 py-4 font-mono">0a</td>
+                  <td class="px-6 py-4 font-mono">d8</td>
+                  <td class="px-6 py-4 font-mono">19</td>
+                  <!---->
+                </tr>
+                <tr class="border-b border-gray-200 bg-white dark:border-gray-700">
+                  <th scope="row" class="px-6 py-4 font-medium whitespace-nowrap text-gray-900 dark:text-white">byte</th>
+                  <td class="px-6 py-4 font-mono">248</td>
+                  <td class="px-6 py-4 font-mono">10</td>
+                  <td class="px-6 py-4 font-mono">216</td>
+                  <td class="px-6 py-4 font-mono">25</td>
+                  <!---->
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="relative mt-4 overflow-x-auto font-mono">
+            <table class="w-full text-left text-sm text-gray-500 rtl:text-right dark:text-gray-400">
+              <tbody>
+                <tr class="border-b border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-800">
+                  <td class="px-4"></td>
+                  <td class="px-2 py-4">0.968750000000</td>
+                  <td class="px-6 py-4">(248 / (256 ^ 1))</td>
+                </tr>
+                <tr class="border-b border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-800">
+                  <td class="px-4"></td>
+                  <td class="px-2 py-4">0.000152587891</td>
+                  <td class="px-6 py-4">(010 / (256 ^ 2))</td>
+                </tr>
+                <tr class="border-b border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-800">
+                  <td class="px-4"></td>
+                  <td class="px-2 py-4">0.000012874603</td>
+                  <td class="px-6 py-4">(216 / (256 ^ 3))</td>
+                </tr>
+                <tr class="border-b border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-800">
+                  <td class="px-4"></td>
+                  <td class="px-2 py-4">0.000000005821</td>
+                  <td class="px-6 py-4">(025 / (256 ^ 4))</td>
+                </tr>
+                <!---->
+                <tr class="border-b border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-800">
+                  <td class="px-4">=</td>
+                  <td class="px-2 py-4">0.968915468315</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div>
+          <p class="mt-7 mb-2 text-xl">Step 2</p>
+          <p class="text-base">Transform float into roll number</p>
+          <p class="text-sm text-gray-500">Formula taken from <span class="font-bold">Dice Roll</span> section on the game events page</p>
+          <pre class="mt-3 text-base">floor(0.968915468315 * 10001) / 100 = 96.90</pre>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!--]--><!--]--><!--]-->
+</div>
