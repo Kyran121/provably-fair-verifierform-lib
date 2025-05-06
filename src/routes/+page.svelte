@@ -4,6 +4,7 @@
   import DiceResult from '../stake/DiceResult.svelte';
   import DiceExplanation from '../stake/DiceExplanation.svelte';
   import LimboResult from '../stake/LimboResult.svelte';
+  import CrashResult from '../stake/CrashResult.svelte';
 
   const controls: Control[] = [
     {
@@ -45,6 +46,24 @@
       name: 'Limbo',
       controls,
       ResultComponent: LimboResult
+    },
+    crash: {
+      name: 'Crash',
+      controls: [
+        controls[0],
+        {
+          id: 'serverseed',
+          name: 'serverseed',
+          label: 'Server Seed',
+          type: 'text',
+          disabled: true,
+          syncToUrl: false,
+          attrs: {
+            value: '0000000000000000001b34dc6a1e86083f95500b096231436e9b25cbdd0075c4'
+          }
+        }
+      ],
+      ResultComponent: CrashResult
     }
   }}
 />

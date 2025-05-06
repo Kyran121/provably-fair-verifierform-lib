@@ -7,7 +7,9 @@ export interface Control {
   name: string;
   label: string;
   type: ControlType;
-  required: boolean;
+  required?: boolean; //defaults to false
+  disabled?: boolean; //defaults to false
+  syncToUrl?: boolean; //defaults to true
   options?: { label: string; value: string }[];
   attrs?: Record<string, unknown>;
 }

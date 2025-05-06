@@ -8,6 +8,8 @@ import type { AfterNavigate } from '@sveltejs/kit';
 import { tick } from 'svelte';
 import type { Control } from '../../../src/lib/verifier/types';
 
+const CRASH_SEED = '0000000000000000001b34dc6a1e86083f95500b096231436e9b25cbdd0075c4';
+
 // Use vi.hoisted to define variables accessible in the mock factory
 const {
   gotoSpy,
@@ -100,7 +102,7 @@ describe('VerifierForm Component', () => {
       expect(nonce).toHaveValue(0);
     });
 
-    test('url query params are loaded into state (different game)', async () => {
+    test('url query params are loaded into state (roulette)', async () => {
       pageStateRef.current.url = new URL(
         'http://localhost:8080/?game=roulette&clientseed=123&serverseed=456&nonce=0'
       );
@@ -118,6 +120,22 @@ describe('VerifierForm Component', () => {
 
       const nonce = screen.getByLabelText(/Nonce\*/);
       expect(nonce).toHaveValue(0);
+    });
+
+    test('url query params are loaded into state (crash)', async () => {
+      pageStateRef.current.url = new URL('http://localhost:8080/?game=crash&clientseed=123');
+
+      setupVerifierForm();
+
+      const game = screen.getByLabelText(/Select Game:/);
+      expect(game).toHaveValue('crash');
+
+      const clientSeed = screen.getByLabelText(/Client Seed\*/);
+      expect(clientSeed).toHaveValue('123');
+
+      const serverSeed = screen.getByLabelText(/Server Seed/);
+      expect(serverSeed).toHaveValue(CRASH_SEED);
+      expect(serverSeed).toBeDisabled();
     });
 
     test('state changes propagate to url query params', async () => {
@@ -305,6 +323,25 @@ describe('VerifierForm Component', () => {
                 label: 'Optional',
                 type: 'text',
                 required: false
+              }
+            ],
+            ResultComponent: TestResult,
+            ExplanationComponent: TestExplanation
+          },
+          crash: {
+            name: 'crash',
+            controls: [
+              COMMON_CONTROLS[0],
+              {
+                id: 'serverseed',
+                name: 'serverseed',
+                label: 'Server Seed',
+                type: 'text',
+                disabled: true,
+                syncToUrl: false,
+                attrs: {
+                  value: CRASH_SEED
+                }
               }
             ],
             ResultComponent: TestResult,

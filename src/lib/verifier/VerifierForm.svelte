@@ -41,8 +41,12 @@
 
     // check for control change
     if (game && game in games && game === page.url.searchParams.get('game')) {
-      const qs = new URLSearchParams(Object.entries(formValues) as string[][]).toString();
+      // filter to values syncable to url
+      const formValuesFiltered = Object.entries(formValues).filter(([k]) =>
+        controlsMap[k] && 'syncToUrl' in controlsMap[k] ? controlsMap[k].syncToUrl : true
+      ) as string[][];
 
+      const qs = new URLSearchParams(formValuesFiltered).toString();
       if (qs !== page.url.searchParams.toString()) {
         showExplanation = false;
 
