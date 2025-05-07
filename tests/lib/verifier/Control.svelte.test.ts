@@ -40,7 +40,6 @@ describe('Control Component', () => {
       attrs: { placeholder: 'Enter username' }
     };
 
-    const user = userEvent.setup();
     render(ControlForTest, { props: { control } });
 
     const input = screen.getByLabelText(/Username \(disabled\)/);
@@ -135,7 +134,6 @@ describe('Control Component', () => {
       options: ['uk', 'us']
     };
 
-    const user = userEvent.setup();
     render(ControlForTest, { props: { control, value: 'uk' } });
 
     const select = screen.getByLabelText(/Country \(disabled\)/);
