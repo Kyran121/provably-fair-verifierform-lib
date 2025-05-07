@@ -77,9 +77,7 @@
     for (const [key, val] of page.url.searchParams.entries()) {
       if (controlsMap[key]?.type === 'select') {
         // set to first option if option is invalid
-        if (
-          !controlsMap[key].options!.some(value => value === page.url.searchParams.get(key)!)
-        ) {
+        if (!controlsMap[key].options!.some((value) => value === page.url.searchParams.get(key)!)) {
           formValues[key] = controlsMap[key].options![0] as string;
         }
       }
