@@ -75,13 +75,21 @@
     }
     // check for control changes
     for (const [key, val] of page.url.searchParams.entries()) {
+      if (controlsMap[key]?.type === 'select') {
+        // set to first option if option is invalid
+        if (
+          !controlsMap[key].options!.some(value => value === page.url.searchParams.get(key)!)
+        ) {
+          formValues[key] = controlsMap[key].options![0] as string;
+        }
+      }
       if (formValues[key] !== val) {
         if (controlsMap[key].type === 'number') {
           // parse number if control is a number
           if (formValues[key] !== null) {
             formValues[key] = parseInt(val);
           }
-        } else {
+        } else if (controlsMap[key].type === 'text') {
           formValues[key] = val;
         }
       }

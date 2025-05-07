@@ -29,6 +29,25 @@ describe('Control Component', () => {
     expect(input).toHaveValue('john');
   });
 
+  it('renders a text input when control.type is "text" (disabled)', async () => {
+    const control: Control = {
+      id: 'username',
+      name: 'username',
+      label: 'Username',
+      type: 'text',
+      disabled: true,
+      syncToUrl: true,
+      attrs: { placeholder: 'Enter username' }
+    };
+
+    const user = userEvent.setup();
+    render(ControlForTest, { props: { control } });
+
+    const input = screen.getByLabelText(/Username \(disabled\)/);
+    expect(input).toBeInTheDocument();
+    expect(input).toBeDisabled();
+  });
+
   it('renders a number input when control.type is "number"', async () => {
     const control: Control = {
       id: 'age',
@@ -61,10 +80,7 @@ describe('Control Component', () => {
       label: 'Country',
       type: 'select',
       required: true,
-      options: [
-        { label: 'UK', value: 'uk' },
-        { label: 'USA', value: 'us' }
-      ]
+      options: ['uk', 'us']
     };
 
     const user = userEvent.setup();
@@ -76,10 +92,55 @@ describe('Control Component', () => {
 
     const options = screen.getAllByRole('option');
     expect(options).toHaveLength(2);
-    expect(options[0]).toHaveTextContent('UK');
-    expect(options[1]).toHaveTextContent('USA');
+    expect(options[0]).toHaveTextContent('uk');
+    expect(options[1]).toHaveTextContent('us');
 
     await user.selectOptions(select, 'us');
     expect(select).toHaveValue('us');
+  });
+
+  it('renders a select input when control.type is "select"', async () => {
+    const control: Control = {
+      id: 'country',
+      name: 'country',
+      label: 'Country',
+      type: 'select',
+      required: true,
+      options: ['uk', 'us']
+    };
+
+    const user = userEvent.setup();
+    render(ControlForTest, { props: { control, value: 'uk' } });
+
+    const select = screen.getByLabelText(/Country\*/);
+    expect(select).toBeInTheDocument();
+    expect(select).toHaveValue('uk');
+
+    const options = screen.getAllByRole('option');
+    expect(options).toHaveLength(2);
+    expect(options[0]).toHaveTextContent('uk');
+    expect(options[1]).toHaveTextContent('us');
+
+    await user.selectOptions(select, 'us');
+    expect(select).toHaveValue('us');
+  });
+
+  it('renders a select input when control.type is "select" (disabled)', async () => {
+    const control: Control = {
+      id: 'country',
+      name: 'country',
+      label: 'Country',
+      type: 'select',
+      disabled: true,
+      options: ['uk', 'us']
+    };
+
+    const user = userEvent.setup();
+    render(ControlForTest, { props: { control, value: 'uk' } });
+
+    const select = screen.getByLabelText(/Country \(disabled\)/);
+    expect(select).toBeInTheDocument();
+    expect(select).toHaveValue('uk');
+    expect(select).toBeDisabled();
   });
 });

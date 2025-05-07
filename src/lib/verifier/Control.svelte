@@ -6,7 +6,7 @@
   let violation = $derived((value === undefined || value === '') && control.required);
 </script>
 
-<div class={["group relative z-0 w-full", control.disabled ? "mt-7" : "mt-5"]}>
+<div class={['group relative z-0 w-full', control.disabled ? 'mt-7' : 'mt-5']}>
   {#if control.type === 'select' && control.options}
     <select
       id={control.id}
@@ -23,8 +23,8 @@
       aria-invalid={violation}
       {...violation && { 'aria-errormessage': `${control.id}-error-message` }}
     >
-      {#each control.options as opt (opt.value)}
-        <option value={opt.value}>{opt.label}</option>
+      {#each control.options as opt (opt)}
+        <option value={opt}>{opt}</option>
       {/each}
     </select>
   {:else if 'syncToUrl' in control ? control.syncToUrl : true}

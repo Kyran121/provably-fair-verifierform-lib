@@ -9,6 +9,10 @@ import { tick } from 'svelte';
 import type { Control } from '../../../src/lib/verifier/types';
 
 const CRASH_SEED = '0000000000000000001b34dc6a1e86083f95500b096231436e9b25cbdd0075c4';
+const SLIDE_SEEDS = [
+  '0000000000000000000b20f796f5421cac95c4efb06c6bbf6408d6f9b5d7b9dc',
+  '00000000000000000000644330e1340fc6e894a95c37060bdd180ed11d068944'
+];
 
 // Use vi.hoisted to define variables accessible in the mock factory
 const {
@@ -123,19 +127,19 @@ describe('VerifierForm Component', () => {
     });
 
     test('url query params are loaded into state (crash)', async () => {
-      pageStateRef.current.url = new URL('http://localhost:8080/?game=crash&clientseed=123');
+      pageStateRef.current.url = new URL('http://localhost:8080/?game=crash&gamehash=123');
 
       setupVerifierForm();
 
       const game = screen.getByLabelText(/Select Game:/);
       expect(game).toHaveValue('crash');
 
-      const clientSeed = screen.getByLabelText(/Client Seed\*/);
-      expect(clientSeed).toHaveValue('123');
+      const gameHash = screen.getByLabelText(/Game Hash\*/);
+      expect(gameHash).toHaveValue('123');
 
-      const serverSeed = screen.getByLabelText(/Server Seed/);
-      expect(serverSeed).toHaveValue(CRASH_SEED);
-      expect(serverSeed).toBeDisabled();
+      const blockHash = screen.getByLabelText(/Block Hash/);
+      expect(blockHash).toHaveValue(CRASH_SEED);
+      expect(blockHash).toBeDisabled();
     });
 
     test('state changes propagate to url query params', async () => {
@@ -298,6 +302,31 @@ describe('VerifierForm Component', () => {
     expect(urlArg).toBe('?game=dice');
   });
 
+  test('invalid option causes to reset to the first option', async () => {
+    await navigateTo(
+      new URL('http://localhost:8080/?game=slide&slidehash=123&blockhash=' + SLIDE_SEEDS[1])
+    );
+
+    setupVerifierForm();
+
+    const game = screen.getByLabelText(/Select Game:/);
+    expect(game).toHaveValue('slide');
+
+    const slidehash = screen.getByLabelText(/Slide Hash\*/);
+    expect(slidehash).toHaveValue('123');
+
+    const blockhash = screen.getByLabelText(/Block Hash/);
+    expect(blockhash).toHaveValue(SLIDE_SEEDS[1]);
+
+    await navigateTo(new URL('http://localhost:8080/?game=slide&slidehash=123&blockhash=456'));
+
+    expect(gotoSpy).toHaveBeenCalledOnce();
+    const [urlArg] = gotoSpy.mock.calls[0];
+    expect(urlArg).toContain('?game=slide');
+    expect(urlArg).toContain('slidehash=123');
+    expect(urlArg).toContain('blockhash=' + SLIDE_SEEDS[0]);
+  });
+
   test('empty params are removed from url', async () => {
     setupVerifierForm();
 
@@ -329,19 +358,47 @@ describe('VerifierForm Component', () => {
             ExplanationComponent: TestExplanation
           },
           crash: {
-            name: 'crash',
+            name: 'Crash',
             controls: [
-              COMMON_CONTROLS[0],
               {
-                id: 'serverseed',
-                name: 'serverseed',
-                label: 'Server Seed',
+                id: 'gamehash',
+                name: 'gamehash',
+                label: 'Game Hash',
+                type: 'text',
+                required: true
+              },
+              {
+                id: 'blockhash',
+                name: 'blockhash',
+                label: 'Block Hash',
                 type: 'text',
                 disabled: true,
                 syncToUrl: false,
                 attrs: {
                   value: CRASH_SEED
                 }
+              }
+            ],
+            ResultComponent: TestResult,
+            ExplanationComponent: TestExplanation
+          },
+          slide: {
+            name: 'Slide',
+            controls: [
+              {
+                id: 'slidehash',
+                name: 'slidehash',
+                label: 'Slide Hash',
+                type: 'text',
+                required: true
+              },
+              {
+                id: 'blockhash',
+                name: 'blockhash',
+                label: 'Block Hash',
+                type: 'select',
+                syncToUrl: true,
+                options: SLIDE_SEEDS
               }
             ],
             ResultComponent: TestResult,

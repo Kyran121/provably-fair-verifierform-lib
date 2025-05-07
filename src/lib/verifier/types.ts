@@ -10,7 +10,7 @@ export interface Control {
   required?: boolean; //defaults to false
   disabled?: boolean; //defaults to false
   syncToUrl?: boolean; //defaults to true
-  options?: { label: string; value: string }[];
+  options?: string[];
   attrs?: Record<string, unknown>;
 }
 
