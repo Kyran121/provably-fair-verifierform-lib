@@ -1,6 +1,6 @@
-import type { GameDefinition } from './verifier/types';
+import type { Control, GameDefinition } from './verifier/types';
 import VerifierForm from './verifier/VerifierForm.svelte';
 
 // Reexport your entry components here
-export type { GameDefinition };
+export type { Control, GameDefinition };
 export { VerifierForm };
