@@ -23,6 +23,29 @@ describe('Control Component', () => {
     expect(input).toHaveAttribute('id', 'username');
     expect(input).toHaveAttribute('required');
     expect(input).toHaveAttribute('placeholder', 'Enter username');
+
+    await user.type(input, 'john');
+    expect(input).toHaveValue('john');
+  });
+
+  it('renders a text input when control.type is "text" (error)', async () => {
+    const control: Control = {
+      id: 'username',
+      name: 'username',
+      label: 'Username',
+      type: 'text',
+      required: true,
+      attrs: { placeholder: 'Enter username' }
+    };
+
+    const user = userEvent.setup();
+    render(ControlForTest, { props: { control, error: 'Required' } });
+
+    const input = screen.getByLabelText(/Username\*/);
+    expect(input).toBeInTheDocument();
+    expect(input).toHaveAttribute('id', 'username');
+    expect(input).toHaveAttribute('required');
+    expect(input).toHaveAttribute('placeholder', 'Enter username');
     expect(input).toHaveAccessibleErrorMessage('Required');
 
     await user.type(input, 'john');
@@ -70,32 +93,6 @@ describe('Control Component', () => {
 
     await user.type(input, '75');
     expect(input).toHaveValue(75);
-  });
-
-  it('renders a select input when control.type is "select"', async () => {
-    const control: Control = {
-      id: 'country',
-      name: 'country',
-      label: 'Country',
-      type: 'select',
-      required: true,
-      options: ['uk', 'us']
-    };
-
-    const user = userEvent.setup();
-    render(ControlForTest, { props: { control, value: 'uk' } });
-
-    const select = screen.getByLabelText(/Country\*/);
-    expect(select).toBeInTheDocument();
-    expect(select).toHaveValue('uk');
-
-    const options = screen.getAllByRole('option');
-    expect(options).toHaveLength(2);
-    expect(options[0]).toHaveTextContent('uk');
-    expect(options[1]).toHaveTextContent('us');
-
-    await user.selectOptions(select, 'us');
-    expect(select).toHaveValue('us');
   });
 
   it('renders a select input when control.type is "select"', async () => {

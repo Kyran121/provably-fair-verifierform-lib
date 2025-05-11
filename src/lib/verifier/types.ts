@@ -1,4 +1,5 @@
 import type { Component } from 'svelte';
+import type { z } from 'zod';
 
 export type ControlType = 'text' | 'number' | 'select';
 
@@ -14,9 +15,10 @@ export interface Control {
   attrs?: Record<string, unknown>;
 }
 
-export interface GameDefinition {
+export interface GameDefinition<T extends z.ZodTypeAny = z.ZodTypeAny> {
   name: string;
   controls: Control[];
+  schema: T;
   ResultComponent: Component<{ formValues: Record<string, unknown> }>;
   ExplanationComponent?: Component<{ formValues: Record<string, unknown> }>;
 }

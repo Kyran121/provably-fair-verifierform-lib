@@ -17,6 +17,9 @@ importers:
       '@playwright/test':
         specifier: ^1.49.1
         version: 1.52.0
+      '@stablelib/hex':
+        specifier: ^2.0.1
+        version: 2.0.1
       '@stablelib/hmac':
         specifier: ^2.0.1
         version: 2.0.1
@@ -110,6 +113,9 @@ importers:
       yaml:
         specifier: ^2.7.1
         version: 2.7.1
+      zod:
+        specifier: ^3.24.4
+        version: 3.24.4
 
 packages:
 
@@ -559,6 +565,9 @@ packages:
 
   '@stablelib/hash@2.0.0':
     resolution: {integrity: sha512-u3WPSqGido8lwJuMcrBgM5K54LrPGhkWAdtsyccf7dGsLixAZUds77zOAbu7bvKPwQlmoByH0txBi5rTmEKuHg==}
+
+  '@stablelib/hex@2.0.1':
+    resolution: {integrity: sha512-nsAgs3109myeijRQg3HASq3vlxe/8uDKHEUuIwn9ZLxfWtXavgojAGLBjI7Sda6seOhy7rKrpmeehYo0Z5VGQA==}
 
   '@stablelib/hmac@2.0.1':
     resolution: {integrity: sha512-YDMEmogYNDWESU8ggMiTi4VDMfHt2XG+pgVskJCHuKVlmWwXxYKZ6bn5dq24/jU3vzZSajwKzRCU6iafT2OKUA==}
@@ -2058,6 +2067,9 @@ packages:
   zimmerframe@1.1.2:
     resolution: {integrity: sha512-rAbqEGa8ovJy4pyBxZM70hg4pE6gDgaQ0Sl9M3enG3I0d6H4XSAM3GeNGLKnsBpuijUow064sf7ww1nutC5/3w==}
 
+  zod@3.24.4:
+    resolution: {integrity: sha512-OdqJE9UDRPwWsrHjLN2F8bPxvwJBK22EHLWtanu0LSYr5YqzsaaW3RMgmjwr8Rypg5k+meEJdSPXJZXE/yqOMg==}
+
 snapshots:
 
   '@adobe/css-tools@4.4.2': {}
@@ -2374,6 +2386,8 @@ snapshots:
   '@stablelib/constant-time@2.0.1': {}
 
   '@stablelib/hash@2.0.0': {}
+
+  '@stablelib/hex@2.0.1': {}
 
   '@stablelib/hmac@2.0.1':
     dependencies:
@@ -3815,3 +3829,5 @@ snapshots:
   yocto-queue@0.1.0: {}
 
   zimmerframe@1.1.2: {}
+
+  zod@3.24.4: {}
