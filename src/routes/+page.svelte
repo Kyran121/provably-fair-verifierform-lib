@@ -1,7 +1,7 @@
 <script lang="ts">
   import { z } from 'zod';
   import type { GameDefinition } from '$lib/verifier/types';
-  import VerifierForm from '$lib/verifier/VerifierForm.svelte';
+  import { VerifierForm } from '$lib';
   import DiceResult from '../stake/DiceResult.svelte';
   import DiceExplanation from '../stake/DiceExplanation.svelte';
   import NoopResult from '../stake/NoopResult.svelte';

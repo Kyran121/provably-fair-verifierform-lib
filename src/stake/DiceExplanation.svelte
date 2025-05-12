@@ -26,7 +26,7 @@
 </script>
 
 <div class="mt-5 border-0 text-center dark:text-white">
-  <div id="step-content" class="mt-2 pt-4 pb-4 text-left text-sm dark:bg-gray-900 dark:text-white">
+  <div id="step-content" class="pb-4 text-left text-sm dark:bg-gray-900 dark:text-white">
     {#if floatDebounced.debouncing}
       <p class="text-center text-base">
         <span class="text-sm text-gray-500 italic dark:text-gray-400">Computing...</span>

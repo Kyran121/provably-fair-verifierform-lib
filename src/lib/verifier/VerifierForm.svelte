@@ -177,7 +177,7 @@
       >
         {showExplanation ? 'Hide Explanation' : 'Show Explanation'}
       </button>
-      <div class={['mt-4 dark:text-white', showExplanation ? '' : 'hidden']}>
+      <div class={['dark:text-white', showExplanation ? '' : 'hidden']}>
         <Explanation {formValues} />
       </div>
     {/if}
