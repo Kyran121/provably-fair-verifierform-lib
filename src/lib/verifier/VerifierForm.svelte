@@ -43,7 +43,7 @@
   let validationResult = $derived.by(() => {
     const cleaned = Object.fromEntries(
       Object.entries(formValues)
-        .filter(([_, v]) => v !== null && v !== '')
+        .filter(([, v]) => v !== null && v !== '')
         .map(([k, v]) => (controlsMap[k]?.type === 'number' ? [k, parseInt(v as string)] : [k, v]))
     );
     return schema?.safeParse(cleaned);
