@@ -17,7 +17,9 @@
       href="https://stake.com/provably-fair/game-events">game events</a
     > page
   </p>
-  <pre class="text-sm whitespace-pre-wrap text-gray-500 dark:text-gray-400" data-testid="dice-formula">
+  <pre
+    class="text-sm whitespace-pre-wrap text-gray-500 dark:text-gray-400"
+    data-testid="dice-formula">
     {rollNumberEquation}
   </pre>
 </div>

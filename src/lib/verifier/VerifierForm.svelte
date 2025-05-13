@@ -108,9 +108,7 @@
           formValues[key] = controlsMap[key].options![0];
         }
       } else if (formValues[key] !== val) {
-
-        formValues[key] =
-          controlsMap[key].type === 'number' ? parseInt(val) : val;
+        formValues[key] = controlsMap[key].type === 'number' ? parseInt(val) : val;
       }
     }
     // remove empty/null values

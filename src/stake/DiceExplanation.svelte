@@ -4,7 +4,7 @@
   import FloatGenerationStep from './FloatGenerationStep.svelte';
   import DiceResultStep from './DiceResultStep.svelte';
   import { debouncer } from './debounce.svelte';
-  
+
   const { formValues }: { formValues: Record<string, unknown> } = $props();
 
   let seed = $derived<StakeSeed>({
