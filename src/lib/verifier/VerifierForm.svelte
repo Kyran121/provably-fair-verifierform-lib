@@ -7,19 +7,25 @@
   import Control from './Control.svelte';
 
   let { games }: { games: Record<string, GameDefinition> } = $props();
-  let showExplanation = $state(false);
 
-  let changeTimeout: number | undefined = undefined;
+  type GameId = keyof typeof games;
+  const gameIds = Object.keys(games) as GameId[];
 
-  // 1. Initialize state from URL query params
+  // === Reactive State Setup ===
+
   let formValues = $state<Record<string, string | number | null>>(
     Object.fromEntries(page.url.searchParams.entries())
   );
 
   let game = $derived(formValues.game as string);
   let controls = $derived(games[game]?.controls);
+  let schema = $derived(games[game]?.schema);
   let Result = $derived(games[game]?.ResultComponent);
   let Explanation = $derived(games[game]?.ExplanationComponent);
+
+  let showExplanation = $state(false);
+
+  // === Control Mapping ===
 
   let controlsMap = $derived(
     controls?.reduce(
@@ -31,40 +37,61 @@
     )
   );
 
+  // === Validation Logic ===
+
+  // Validate the current form values with the selected game's schema
+  let validationResult = $derived.by(() => {
+    const cleaned = Object.fromEntries(
+      Object.entries(formValues)
+        .filter(([, v]) => v !== null && v !== '')
+        .map(([k, v]) => (controlsMap[k]?.type === 'number' ? [k, parseInt(v as string)] : [k, v]))
+    );
+    return schema?.safeParse(cleaned);
+  });
+
+  // Extract field errors safely
+  let validationErrors = $derived.by(() => {
+    if (!validationResult || validationResult.success) return {};
+    return validationResult.error.flatten().fieldErrors;
+  });
+
+  // Whether the form is valid
+  let formValid = $derived(validationResult?.success === true);
+
+  // === URL Sync ===
+
+  let changeTimeout: number | undefined = undefined;
+
   // 2. Reactive: update URL when state changes
   $effect(() => {
-    // clear any debounce
+    // clear previous delay
     if (changeTimeout !== undefined) {
       clearTimeout(changeTimeout);
-      changeTimeout = undefined;
     }
-
     // check for control change
     if (game && game in games && game === page.url.searchParams.get('game')) {
-      // filter to values syncable to url
-      const formValuesFiltered = Object.entries(formValues).filter(([k]) =>
-        controlsMap[k] && 'syncToUrl' in controlsMap[k] ? controlsMap[k].syncToUrl : true
+      // filter to url synced control values
+      const urlSyncedValues = Object.entries(formValues).filter(
+        ([k, v]) =>
+          (controlsMap[k] && 'syncToUrl' in controlsMap[k] ? controlsMap[k].syncToUrl : true) &&
+          v !== null
       ) as string[][];
 
-      const qs = new URLSearchParams(formValuesFiltered).toString();
+      const qs = new URLSearchParams(urlSyncedValues).toString();
       if (qs !== page.url.searchParams.toString()) {
         showExplanation = false;
 
-        // debounce
-        changeTimeout = setTimeout(() => {
-          shallowNavigate(`?${qs}`);
-          changeTimeout = undefined;
-        }, 350);
+        // delay navigation in case user is still typing
+        changeTimeout = setTimeout(() => shallowNavigate(`?${qs}`), 350);
       }
     }
   });
 
   // 3. Lifecycle: sync state when URL (navigation) changes
   afterNavigate(() => {
-    // set to first game in dropdown if game is invalid
+    // set to first game if invalid game
     if (!page.url.searchParams.has('game') || !(page.url.searchParams.get('game')! in games)) {
-      const firstGame = Object.keys(games)[0];
-      shallowNavigate(`?game=${firstGame}`);
+      shallowNavigate(`?game=${gameIds[0]}`);
       return;
     }
     // check for game change
@@ -76,23 +103,15 @@
     // check for control changes
     for (const [key, val] of page.url.searchParams.entries()) {
       if (controlsMap[key]?.type === 'select') {
-        // set to first option if option is invalid
-        if (!controlsMap[key].options!.some((value) => value === page.url.searchParams.get(key)!)) {
-          formValues[key] = controlsMap[key].options![0] as string;
+        // set to first option if invalid option
+        if (!controlsMap[key].options!.includes(val)) {
+          formValues[key] = controlsMap[key].options![0];
         }
-      }
-      if (formValues[key] !== val) {
-        if (controlsMap[key].type === 'number') {
-          // parse number if control is a number
-          if (formValues[key] !== null) {
-            formValues[key] = parseInt(val);
-          }
-        } else if (controlsMap[key].type === 'text') {
-          formValues[key] = val;
-        }
+      } else if (formValues[key] !== val) {
+        formValues[key] = controlsMap[key].type === 'number' ? parseInt(val) : val;
       }
     }
-    // Remove keys no longer in URL or which are null/empty
+    // remove empty/null values
     for (const key of Object.keys(formValues)) {
       if (!page.url.searchParams.has(key) || formValues[key] === null || formValues[key] === '') {
         delete formValues[key];
@@ -112,14 +131,6 @@
       noScroll: true
     });
   }
-
-  const allRequiredFilled = $derived(
-    controls?.every((c) => {
-      if (!c.required) return true;
-      const val = formValues[c.id];
-      return val !== undefined && val !== '' && !(typeof val === 'number' && isNaN(val));
-    })
-  );
 </script>
 
 <div class="mx-auto max-w-xl rounded-b-lg p-4">
@@ -143,12 +154,16 @@
   <!-- Dynamic Form Controls -->
   <div class="mb-6 space-y-3">
     {#each controls as control (control.id)}
-      <Control {control} bind:value={formValues[control.id] as string} />
+      <Control
+        {control}
+        bind:value={formValues[control.id] as string}
+        error={validationErrors[control.id]?.[0]}
+      />
     {/each}
   </div>
 
   <!-- Result and Explanation Panels -->
-  {#if allRequiredFilled && Result}
+  {#if formValid && Result}
     <div class="mb-4 rounded dark:text-white">
       <Result {formValues} />
     </div>
@@ -160,7 +175,7 @@
       >
         {showExplanation ? 'Hide Explanation' : 'Show Explanation'}
       </button>
-      <div class={['mt-4 dark:text-white', showExplanation ? '' : 'hidden']}>
+      <div class={['dark:text-white', showExplanation ? '' : 'hidden']}>
         <Explanation {formValues} />
       </div>
     {/if}

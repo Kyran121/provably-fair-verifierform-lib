@@ -6,7 +6,8 @@ import TestExplanation from './DummyExplanationForTest.svelte';
 import userEvent from '@testing-library/user-event';
 import type { AfterNavigate } from '@sveltejs/kit';
 import { tick } from 'svelte';
-import type { Control } from '../../../src/lib/verifier/types';
+import type { Control } from '$lib/verifier/types';
+import { z } from 'zod';
 
 const CRASH_SEED = '0000000000000000001b34dc6a1e86083f95500b096231436e9b25cbdd0075c4';
 const SLIDE_SEEDS = [
@@ -75,6 +76,12 @@ const COMMON_CONTROLS: Control[] = [
     required: true
   }
 ];
+
+const COMMON_SCHEMA = z.object({
+  clientseed: z.string(),
+  serverseed: z.string(),
+  nonce: z.number().nonnegative()
+});
 
 describe('VerifierForm Component', () => {
   beforeEach(async () => {
@@ -344,6 +351,7 @@ describe('VerifierForm Component', () => {
         games: {
           dice: {
             name: 'dice',
+            schema: COMMON_SCHEMA,
             controls: [
               ...COMMON_CONTROLS,
               {
@@ -359,6 +367,10 @@ describe('VerifierForm Component', () => {
           },
           crash: {
             name: 'Crash',
+            schema: z.object({
+              gamehash: z.string(),
+              blockhash: z.string()
+            }),
             controls: [
               {
                 id: 'gamehash',
@@ -384,6 +396,10 @@ describe('VerifierForm Component', () => {
           },
           slide: {
             name: 'Slide',
+            schema: z.object({
+              slidehash: z.string(),
+              blockhash: z.string()
+            }),
             controls: [
               {
                 id: 'slidehash',
@@ -406,6 +422,7 @@ describe('VerifierForm Component', () => {
           },
           roulette: {
             name: 'roulette',
+            schema: COMMON_SCHEMA,
             controls: COMMON_CONTROLS,
             ResultComponent: TestResult,
             ExplanationComponent: TestExplanation

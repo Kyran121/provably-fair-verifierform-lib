@@ -4,3 +4,10 @@ export interface StakeSeed {
   nonce: number;
   cursor?: number;
 }
+
+export interface FloatExplanationStepProps {
+  stepNumber: number;
+  resultIndex: number;
+  float: number;
+  seed: StakeSeed;
+}
