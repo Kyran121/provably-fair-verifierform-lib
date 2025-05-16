@@ -417,7 +417,6 @@ describe('VerifierForm Component', () => {
                 options: SLIDE_SEEDS
               }
             ],
-
             ResultComponent: TestResult,
             ExplanationComponent: TestExplanation
           },
