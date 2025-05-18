@@ -5,6 +5,7 @@
   import { goto, afterNavigate } from '$app/navigation';
   import type { Control as TControl } from '$lib/verifier/types';
   import Control from './Control.svelte';
+  import { untrack } from 'svelte';
 
   let { games }: { games: Record<string, GameDefinition> } = $props();
 
@@ -23,7 +24,12 @@
   let Result = $derived(games[game]?.ResultComponent);
   let Explanation = $derived(games[game]?.ExplanationComponent);
 
+  let firstNavigation = $state(true);
   let showExplanation = $state(false);
+
+  // === Inspections === 
+
+  // $inspect(formValues);
 
   // === Control Mapping ===
 
@@ -36,7 +42,7 @@
       {} as Record<string, TControl>
     )
   );
-
+  
   // === Validation Logic ===
 
   // Validate the current form values with the selected game's schema
@@ -100,28 +106,61 @@
       showExplanation = false;
       return;
     }
+
+    const newFormValues: Record<string, string | number | null> = formValues;
     // check for control changes
     for (const [key, val] of page.url.searchParams.entries()) {
       if (controlsMap[key]?.type === 'select') {
         // set to first option if invalid option
         if (!controlsMap[key].options!.includes(val)) {
-          formValues[key] = controlsMap[key].options![0];
+          newFormValues[key] = controlsMap[key].options![0];
         }
       } else if (formValues[key] !== val) {
-        formValues[key] = controlsMap[key].type === 'number' ? parseInt(val) : val;
+        newFormValues[key] = controlsMap[key].type === 'number' ? parseInt(val) : val;
       }
     }
     // remove empty/null values
-    for (const key of Object.keys(formValues)) {
-      if (!page.url.searchParams.has(key) || formValues[key] === null || formValues[key] === '') {
-        delete formValues[key];
+    for (const key of Object.keys(newFormValues)) {
+      if (!page.url.searchParams.has(key) || newFormValues[key] === null || newFormValues[key] === '') {
+        delete newFormValues[key];
       }
     }
+    // mount hook
+    if (firstNavigation) {
+      untrack(() => (firstNavigation = false));
+      
+      for (const key in controlsMap) {
+        if (!(key in newFormValues)) {
+          if (controlsMap[key].type === 'select') {
+            // set to first option if value is not provided
+            newFormValues[key] = controlsMap[key].options![0];
+          } else if (controlsMap[key].default) {
+            // set to default value if value is not provided
+            newFormValues[key] = controlsMap[key].default;
+          }
+        }
+      }
+    }
+
+    formValues = newFormValues;
   });
 
   function handleGameChange(event: Event) {
     const selectedGame = (event.target as HTMLSelectElement).value;
-    shallowNavigate(`?game=${selectedGame}`);
+    
+    const newFormValues: Record<string, string | number | null> = {}
+    newFormValues.game = selectedGame;
+    for (const control of games[selectedGame].controls) {
+      if (control.type === 'select') {
+        newFormValues[control.id] = control.options![0];
+      } else if (control.default) {
+        newFormValues[control.id] = control.default;
+      }
+    }
+    formValues = newFormValues;
+
+    const qs = new URLSearchParams(Object.entries(newFormValues) as string[][]).toString();
+    shallowNavigate(`?${qs}`);
   }
 
   function shallowNavigate(path: string) {

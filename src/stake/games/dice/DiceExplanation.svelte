@@ -1,9 +1,9 @@
 <script lang="ts">
-  import type { StakeSeed } from './types';
-  import FloatGenerator from './generator/FloatGenerator';
+  import type { StakeSeed } from '../../types';
+  import FloatGenerator from '../../generator/FloatGenerator';
   import FloatGenerationStep from './FloatGenerationStep.svelte';
   import DiceResultStep from './DiceResultStep.svelte';
-  import { debouncer } from './debounce.svelte';
+  import { debouncer } from '../../debounce.svelte';
 
   const { formValues }: { formValues: Record<string, unknown> } = $props();
 

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { FloatExplanationStepProps } from './types';
+  import type { FloatExplanationStepProps } from '../../types';
   import { hmac as createHmac } from '@stablelib/hmac';
   import { SHA256 } from '@stablelib/sha256';
   import { encode as toUInt8Array } from '@stablelib/utf8';

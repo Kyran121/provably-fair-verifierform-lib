@@ -8,6 +8,10 @@ import type { AfterNavigate } from '@sveltejs/kit';
 import { tick } from 'svelte';
 import type { Control } from '$lib/verifier/types';
 import { z } from 'zod';
+import {
+  CLIENT_SEED_SERVER_SEED_NONCE_CONTROLS,
+  CLIENT_SEED_SERVER_SEED_NONCE_SCHEMA
+} from '../../../src/stake/setup';
 
 const CRASH_SEED = '0000000000000000001b34dc6a1e86083f95500b096231436e9b25cbdd0075c4';
 const SLIDE_SEEDS = [
@@ -51,36 +55,6 @@ vi.mock('$app/state', () => {
   };
   pageStateRef.current = page;
   return { page };
-});
-
-const COMMON_CONTROLS: Control[] = [
-  {
-    id: 'clientseed',
-    name: 'clientseed',
-    label: 'Client Seed',
-    type: 'text',
-    required: true
-  },
-  {
-    id: 'serverseed',
-    name: 'serverseed',
-    label: 'Server Seed',
-    type: 'text',
-    required: true
-  },
-  {
-    id: 'nonce',
-    name: 'nonce',
-    label: 'Nonce',
-    type: 'number',
-    required: true
-  }
-];
-
-const COMMON_SCHEMA = z.object({
-  clientseed: z.string(),
-  serverseed: z.string(),
-  nonce: z.number().nonnegative()
 });
 
 describe('VerifierForm Component', () => {
@@ -334,6 +308,52 @@ describe('VerifierForm Component', () => {
     expect(urlArg).toContain('blockhash=' + SLIDE_SEEDS[0]);
   });
 
+  describe('default values set if not provided', () => {
+    test('mount hook', async () => {
+      // set initial game
+      await navigateTo(new URL('http://localhost:8080/?game=plinko'));
+
+      setupVerifierForm();
+
+      // set default values
+      await navigateTo(new URL('http://localhost:8080/?game=plinko'));
+
+      const game = screen.getByLabelText(/Select Game:/);
+      expect(game).toHaveValue('plinko');
+
+      const risk = screen.getByLabelText(/Risk/);
+      expect(risk).toHaveValue('low');
+
+      const rows = screen.getByLabelText(/Rows\*/);
+      expect(rows).toHaveValue(8);
+
+      expect(gotoSpy).toHaveBeenCalledOnce();
+      const [urlArg] = gotoSpy.mock.calls[0];
+      expect(urlArg).toContain('?game=plinko');
+      expect(urlArg).toContain('risk=low');
+      expect(urlArg).toContain('rows=8');
+    });
+
+    test('game change', async () => {
+      const { user } = setupVerifierForm();
+
+      const game = screen.getByLabelText(/Select Game:/);
+      await user.selectOptions(game, 'plinko');
+
+      const risk = screen.getByLabelText(/Risk/);
+      expect(risk).toHaveValue('low');
+
+      const rows = screen.getByLabelText(/Rows\*/);
+      expect(rows).toHaveValue(8);
+
+      expect(gotoSpy).toHaveBeenCalledOnce();
+      const [urlArg] = gotoSpy.mock.calls[0];
+      expect(urlArg).toContain('?game=plinko');
+      expect(urlArg).toContain('risk=low');
+      expect(urlArg).toContain('rows=8');
+    });
+  });
+
   test('empty params are removed from url', async () => {
     setupVerifierForm();
 
@@ -351,9 +371,9 @@ describe('VerifierForm Component', () => {
         games: {
           dice: {
             name: 'dice',
-            schema: COMMON_SCHEMA,
+            schema: CLIENT_SEED_SERVER_SEED_NONCE_SCHEMA,
             controls: [
-              ...COMMON_CONTROLS,
+              ...CLIENT_SEED_SERVER_SEED_NONCE_CONTROLS,
               {
                 id: 'optional',
                 name: 'optional',
@@ -422,8 +442,39 @@ describe('VerifierForm Component', () => {
           },
           roulette: {
             name: 'roulette',
-            schema: COMMON_SCHEMA,
-            controls: COMMON_CONTROLS,
+            schema: CLIENT_SEED_SERVER_SEED_NONCE_SCHEMA,
+            controls: CLIENT_SEED_SERVER_SEED_NONCE_CONTROLS,
+            ResultComponent: TestResult,
+            ExplanationComponent: TestExplanation
+          },
+          plinko: {
+            name: 'plinko',
+            schema: CLIENT_SEED_SERVER_SEED_NONCE_SCHEMA.extend({
+              risk: z.enum(['low', 'medium', 'high']),
+              rows: z.number().min(8).max(16)
+            }),
+            controls: [
+              ...CLIENT_SEED_SERVER_SEED_NONCE_CONTROLS,
+              {
+                id: 'risk',
+                name: 'risk',
+                label: 'Risk',
+                type: 'select',
+                options: ['low', 'medium', 'high']
+              },
+              {
+                id: 'rows',
+                name: 'rows',
+                label: 'Rows',
+                type: 'number',
+                required: true,
+                default: 8,
+                attrs: {
+                  min: 8,
+                  max: 16
+                }
+              }
+            ],
             ResultComponent: TestResult,
             ExplanationComponent: TestExplanation
           }
