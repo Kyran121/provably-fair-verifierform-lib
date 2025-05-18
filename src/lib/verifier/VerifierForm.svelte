@@ -138,7 +138,7 @@
           if (controlsMap[key].type === 'select') {
             // set to first option if value is not provided
             newFormValues[key] = controlsMap[key].options![0];
-          } else if (controlsMap[key].default) {
+          } else if ('default' in controlsMap[key] && controlsMap[key].default !== undefined) {
             // set to default value if value is not provided
             newFormValues[key] = controlsMap[key].default;
           }
@@ -157,7 +157,7 @@
     for (const control of games[selectedGame].controls) {
       if (control.type === 'select') {
         newFormValues[control.id] = control.options![0];
-      } else if (control.default) {
+      } else if ('default' in control && control.default !== undefined) {
         newFormValues[control.id] = control.default;
       }
     }
