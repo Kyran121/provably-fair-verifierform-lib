@@ -27,7 +27,7 @@
   let firstNavigation = $state(true);
   let showExplanation = $state(false);
 
-  // === Inspections === 
+  // === Inspections ===
 
   // $inspect(formValues);
 
@@ -42,7 +42,7 @@
       {} as Record<string, TControl>
     )
   );
-  
+
   // === Validation Logic ===
 
   // Validate the current form values with the selected game's schema
@@ -121,14 +121,18 @@
     }
     // remove empty/null values
     for (const key of Object.keys(newFormValues)) {
-      if (!page.url.searchParams.has(key) || newFormValues[key] === null || newFormValues[key] === '') {
+      if (
+        !page.url.searchParams.has(key) ||
+        newFormValues[key] === null ||
+        newFormValues[key] === ''
+      ) {
         delete newFormValues[key];
       }
     }
     // mount hook
     if (firstNavigation) {
       untrack(() => (firstNavigation = false));
-      
+
       for (const key in controlsMap) {
         if (!(key in newFormValues)) {
           if (controlsMap[key].type === 'select') {
@@ -147,8 +151,8 @@
 
   function handleGameChange(event: Event) {
     const selectedGame = (event.target as HTMLSelectElement).value;
-    
-    const newFormValues: Record<string, string | number | null> = {}
+
+    const newFormValues: Record<string, string | number | null> = {};
     newFormValues.game = selectedGame;
     for (const control of games[selectedGame].controls) {
       if (control.type === 'select') {
