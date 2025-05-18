@@ -1,7 +1,7 @@
 import {
   CLIENT_SEED_SERVER_SEED_NONCE_CONTROLS,
   CLIENT_SEED_SERVER_SEED_NONCE_SCHEMA
-} from '../../setup';
+} from '../../controlSetup';
 import { z } from 'zod';
 import NoopResult from '../../NoopResult.svelte';
 import type { GameDefinition } from '$lib';

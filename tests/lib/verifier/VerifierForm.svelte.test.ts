@@ -11,7 +11,7 @@ import { z } from 'zod';
 import {
   CLIENT_SEED_SERVER_SEED_NONCE_CONTROLS,
   CLIENT_SEED_SERVER_SEED_NONCE_SCHEMA
-} from '../../../src/stake/setup';
+} from '../../../src/stake/controlSetup';
 
 const CRASH_SEED = '0000000000000000001b34dc6a1e86083f95500b096231436e9b25cbdd0075c4';
 const SLIDE_SEEDS = [

@@ -3,7 +3,7 @@ import DiceExplanation from './DiceExplanation.svelte';
 import {
   CLIENT_SEED_SERVER_SEED_NONCE_CONTROLS,
   CLIENT_SEED_SERVER_SEED_NONCE_SCHEMA
-} from '../../setup';
+} from '../../controlSetup';
 import type { GameDefinition } from '$lib';
 
 export const gameDefinition: GameDefinition = {
