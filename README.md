@@ -141,6 +141,7 @@ pnpm test
 
 - [Svelte 5](https://github.com/sveltejs/rfcs/pull/53)
 - [Tailwind CSS](https://tailwindcss.com)
+- [Zod](https://zod.dev/)
 - [Vitest](https://vitest.dev)
 - [@testing-library/svelte](https://testing-library.com/docs/svelte-testing-library/intro/)
 
