@@ -6,7 +6,6 @@ import TestExplanation from './DummyExplanationForTest.svelte';
 import userEvent from '@testing-library/user-event';
 import type { AfterNavigate } from '@sveltejs/kit';
 import { tick } from 'svelte';
-import type { Control } from '$lib/verifier/types';
 import { z } from 'zod';
 import {
   CLIENT_SEED_SERVER_SEED_NONCE_CONTROLS,
