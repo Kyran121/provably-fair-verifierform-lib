@@ -6,6 +6,7 @@
   import type { Control as TControl } from '$lib/verifier/types';
   import Control from './Control.svelte';
   import { untrack } from 'svelte';
+  import { browser } from '$app/environment';
 
   let { games }: { games: Record<string, GameDefinition> } = $props();
 
@@ -15,7 +16,7 @@
   // === Reactive State Setup ===
 
   let formValues = $state<Record<string, string | number | null>>(
-    Object.fromEntries(page.url.searchParams.entries())
+    Object.fromEntries(browser ? page.url.searchParams.entries() : [])
   );
 
   let game = $derived(formValues.game as string);
@@ -75,7 +76,7 @@
       clearTimeout(changeTimeout);
     }
     // check for control change
-    if (game && game in games && game === page.url.searchParams.get('game')) {
+    if (browser && game && game in games && game === page.url.searchParams.get('game')) {
       // filter to url synced control values
       const urlSyncedValues = Object.entries(formValues).filter(
         ([k, v]) =>
@@ -96,12 +97,15 @@
   // 3. Lifecycle: sync state when URL (navigation) changes
   afterNavigate(() => {
     // set to first game if invalid game
-    if (!page.url.searchParams.has('game') || !(page.url.searchParams.get('game')! in games)) {
+    if (
+      browser &&
+      (!page.url.searchParams.has('game') || !(page.url.searchParams.get('game')! in games))
+    ) {
       shallowNavigate(`?game=${gameIds[0]}`);
       return;
     }
     // check for game change
-    if (game !== page.url.searchParams.get('game')) {
+    if (browser && game !== page.url.searchParams.get('game')) {
       formValues = { game: page.url.searchParams.get('game') };
       showExplanation = false;
       return;
@@ -109,14 +113,16 @@
 
     const newFormValues: Record<string, string | number | null> = formValues;
     // check for control changes
-    for (const [key, val] of page.url.searchParams.entries()) {
-      if (controlsMap[key]?.type === 'select') {
-        // set to first option if invalid option
-        if (!controlsMap[key].options!.includes(val)) {
-          newFormValues[key] = controlsMap[key].options![0];
+    if (browser) {
+      for (const [key, val] of page.url.searchParams.entries()) {
+        if (controlsMap[key]?.type === 'select') {
+          // set to first option if invalid option
+          if (!controlsMap[key].options!.includes(val)) {
+            newFormValues[key] = controlsMap[key].options![0];
+          }
+        } else if (formValues[key] !== val) {
+          newFormValues[key] = controlsMap[key].type === 'number' ? parseInt(val) : val;
         }
-      } else if (formValues[key] !== val) {
-        newFormValues[key] = controlsMap[key].type === 'number' ? parseInt(val) : val;
       }
     }
     // remove empty/null values
