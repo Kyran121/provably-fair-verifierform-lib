@@ -96,49 +96,45 @@
 
   // 3. Lifecycle: sync state when URL (navigation) changes
   afterNavigate(() => {
-    // set to first game if invalid game
-    if (
-      browser &&
-      (!page.url.searchParams.has('game') || !(page.url.searchParams.get('game')! in games))
-    ) {
-      shallowNavigate(`?game=${gameIds[0]}`);
-      return;
-    }
-    // check for game change
-    if (browser && game !== page.url.searchParams.get('game')) {
-      formValues = { game: page.url.searchParams.get('game') };
-      showExplanation = false;
-      return;
-    }
-
+    const game = page.url.searchParams.get('game');
     const newFormValues: Record<string, string | number | null> = formValues;
-    // check for control changes
-    if (browser) {
-      for (const [key, val] of page.url.searchParams.entries()) {
-        if (controlsMap[key]?.type === 'select') {
-          // set to first option if invalid option
-          if (!controlsMap[key].options!.includes(val)) {
-            newFormValues[key] = controlsMap[key].options![0];
+    if (game && game in games) {
+      // check for control changes
+      if (browser) {
+        for (const [key, val] of page.url.searchParams.entries()) {
+          if (key === 'game') continue;
+          if (controlsMap[key]?.type === 'select') {
+            // set to first option if invalid option
+            if (!controlsMap[key].options!.includes(val)) {
+              newFormValues[key] = controlsMap[key].options![0];
+            }
+          } else if (formValues[key] !== val) {
+            newFormValues[key] = controlsMap[key]?.type === 'number' ? parseInt(val) : val;
           }
-        } else if (formValues[key] !== val) {
-          newFormValues[key] = controlsMap[key].type === 'number' ? parseInt(val) : val;
         }
       }
-    }
-    // remove empty/null values
-    for (const key of Object.keys(newFormValues)) {
-      if (
-        !page.url.searchParams.has(key) ||
-        newFormValues[key] === null ||
-        newFormValues[key] === ''
-      ) {
-        delete newFormValues[key];
+      // remove empty/null values
+      for (const key of Object.keys(newFormValues)) {
+        if (
+          !page.url.searchParams.has(key) ||
+          newFormValues[key] === null ||
+          newFormValues[key] === ''
+        ) {
+          delete newFormValues[key];
+        }
       }
     }
     // mount hook
     if (firstNavigation) {
       untrack(() => (firstNavigation = false));
 
+      //if game is invalid, set to first game
+      if (!(game && game in games)) {
+        changeGame(gameIds[0]);
+        return;
+      }
+
+      //set default inputs for game if not set
       for (const key in controlsMap) {
         if (!(key in newFormValues)) {
           if (controlsMap[key].type === 'select') {
@@ -157,10 +153,13 @@
 
   function handleGameChange(event: Event) {
     const selectedGame = (event.target as HTMLSelectElement).value;
+    changeGame(selectedGame);
+  }
 
+  function changeGame(game: string) {
     const newFormValues: Record<string, string | number | null> = {};
-    newFormValues.game = selectedGame;
-    for (const control of games[selectedGame].controls) {
+    newFormValues.game = game;
+    for (const control of games[game].controls) {
       if (control.type === 'select') {
         newFormValues[control.id] = control.options![0];
       } else if ('default' in control && control.default !== undefined) {
@@ -168,6 +167,7 @@
       }
     }
     formValues = newFormValues;
+    showExplanation = false;
 
     const qs = new URLSearchParams(Object.entries(newFormValues) as string[][]).toString();
     shallowNavigate(`?${qs}`);

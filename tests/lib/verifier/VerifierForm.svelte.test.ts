@@ -261,14 +261,14 @@ describe('VerifierForm Component', () => {
 
     expect(gotoSpy).toHaveBeenCalledOnce();
     const [urlArg] = gotoSpy.mock.calls[0];
-    expect(urlArg).toBe('?game=roulette');
+    expect(urlArg).toBe('?game=roulette&nonce=0');
 
-    await navigateTo(new URL('http://localhost:8080/?game=roulette'));
+    await navigateTo(new URL('http://localhost:8080/?game=roulette&nonce=0'));
 
     expect(game).toHaveValue('roulette');
     expect(clientSeed).toHaveValue('');
     expect(serverSeed).toHaveValue('');
-    expect(nonce).toHaveValue(null);
+    expect(nonce).toHaveValue(0);
     expect(optional).not.toBeInTheDocument();
   });
 
@@ -279,7 +279,7 @@ describe('VerifierForm Component', () => {
 
     expect(gotoSpy).toHaveBeenCalledOnce();
     const [urlArg] = gotoSpy.mock.calls[0];
-    expect(urlArg).toBe('?game=dice');
+    expect(urlArg).toBe('?game=dice&nonce=0');
   });
 
   test('invalid option causes to reset to the first option', async () => {
@@ -360,7 +360,7 @@ describe('VerifierForm Component', () => {
 
     expect(gotoSpy).toHaveBeenCalledOnce();
     const [urlArg] = gotoSpy.mock.calls[0];
-    expect(urlArg).toBe('?game=dice');
+    expect(urlArg).toBe('?game=dice&nonce=0');
   });
 
   function setupVerifierForm() {

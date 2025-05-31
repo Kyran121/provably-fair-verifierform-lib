@@ -28,6 +28,7 @@ export const CLIENT_SEED_SERVER_SEED_NONCE_CONTROLS: Control[] = [
     label: 'Nonce',
     type: 'number',
     required: true,
+    default: 0,
     attrs: {
       min: 0
     }
