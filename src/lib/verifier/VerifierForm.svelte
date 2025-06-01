@@ -191,7 +191,7 @@
     <select
       id="game"
       onchange={handleGameChange}
-      class="block w-full border-0 border-b-1 bg-transparent p-2 focus:ring-0 focus:outline-none dark:text-white"
+      class="block w-full border-0 border-b-1 bg-transparent p-2 focus:border-purple-400 focus:ring-0 focus:outline-none dark:text-white"
     >
       {#each Object.entries(games) as [gameId, gameDef] (gameId)}
         <option value={gameId} {...game === gameId ? { selected: true } : {}}>{gameDef.name}</option
@@ -219,7 +219,10 @@
     <!-- Explanation Toggle -->
     {#if Explanation}
       <button
-        class="m-auto block bg-blue-700 px-5 py-2.5 text-sm font-medium text-white hover:bg-blue-800 focus:ring-0 focus:ring-blue-300 focus:outline-none dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+        class={[
+          'm-auto block px-5 py-2.5 text-sm font-medium text-white focus:ring-0 focus:outline-none',
+          'bg-purple-400 hover:bg-purple-500'
+        ]}
         onclick={() => (showExplanation = !showExplanation)}
       >
         {showExplanation ? 'Hide Explanation' : 'Show Explanation'}

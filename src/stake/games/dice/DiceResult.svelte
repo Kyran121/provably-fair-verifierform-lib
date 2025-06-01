@@ -2,6 +2,7 @@
   import FloatGenerator from '../../generator/FloatGenerator';
   import { debouncer } from '../../debounce.svelte';
   import type { StakeSeed } from '../../types';
+  import { TEXT_HIGHLIGHT_COLOR } from '../../constants';
 
   const { formValues }: { formValues: Record<string, unknown> } = $props();
 
@@ -29,6 +30,8 @@
   </p>
 {:else}
   <p data-testid="dice-result" class="text-center text-base">
-    you rolled a <span class="text-xl text-blue-500">{rollNumberDebounced.value!.toFixed(2)}</span>
+    you rolled a <span class="text-xl {TEXT_HIGHLIGHT_COLOR}"
+      >{rollNumberDebounced.value!.toFixed(2)}</span
+    >
   </p>
 {/if}
