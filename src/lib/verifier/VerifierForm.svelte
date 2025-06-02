@@ -221,7 +221,7 @@
       <button
         class={[
           'm-auto block px-5 py-2.5 text-sm font-medium text-white focus:ring-0 focus:outline-none',
-          'bg-purple-400 hover:bg-purple-500'
+          'bg-purple-500 hover:bg-purple-600'
         ]}
         onclick={() => (showExplanation = !showExplanation)}
       >

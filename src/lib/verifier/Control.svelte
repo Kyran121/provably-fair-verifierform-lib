@@ -18,7 +18,7 @@
       {...control.disabled && { disabled: true }}
       class={[
         'text-md block w-full appearance-none border-0 border-b-2 bg-transparent px-0 py-2.5 text-gray-900',
-        'border-gray-300 focus:border-purple-400 dark:border-gray-400 dark:text-white',
+        'border-gray-300 focus:border-purple-500 dark:border-gray-400 dark:text-white focus:dark:border-purple-400',
         'peer focus:ring-0 focus:outline-none'
       ]}
       placeholder=""
@@ -41,7 +41,8 @@
         'disabled:border-gray-200 disabled:bg-gray-50 disabled:text-gray-500 disabled:shadow-none',
         'dark:text-white dark:disabled:border-gray-700 dark:disabled:bg-gray-800/20',
         error && 'border-red-600 dark:border-red-500',
-        !error && 'border-gray-300 focus:border-purple-400 dark:border-gray-400',
+        !error &&
+          'border-gray-300 focus:border-purple-500 dark:border-gray-400 focus:dark:border-purple-400',
         'focus:ring-0 focus:outline-none',
         'peer'
       ]}
@@ -61,7 +62,8 @@
             'text-md block w-full appearance-none border-0 border-b-1 bg-transparent px-0 py-2.5 text-gray-900',
             'dark:text-white',
             error && 'border-red-600 dark:border-red-500',
-            !error && 'border-gray-300 focus:border-purple-400 dark:border-gray-400',
+            !error &&
+              'border-gray-300 focus:border-purple-500 dark:border-gray-400 focus:dark:border-purple-400',
             'focus:ring-0 focus:outline-none',
             'peer'
           ]
@@ -91,7 +93,7 @@
         'absolute -translate-y-6 scale-90 transform text-sm text-gray-500 duration-300 peer-focus:font-medium dark:text-gray-400',
         'top-3 -z-10 origin-[0] peer-focus:start-0',
         error && 'peer-focus:text-red-600 peer-focus:dark:text-red-500',
-        !error && 'peer-focus:text-purple-400',
+        !error && 'peer-focus:text-purple-500 peer-focus:dark:text-purple-400',
         'peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-100 peer-focus:-translate-y-6 peer-focus:scale-100'
       ]}
     >
