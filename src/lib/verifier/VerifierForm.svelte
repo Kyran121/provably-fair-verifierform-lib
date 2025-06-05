@@ -35,7 +35,7 @@
   // === Control Mapping ===
 
   let controlsMap = $derived(
-    controls?.reduce(
+    (controls || []).reduce(
       (acc, control) => {
         acc[control.id] = control;
         return acc;
