@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from '@testing-library/svelte';
+import { fireEvent, render, screen, waitFor } from '@testing-library/svelte';
 import { describe, test, expect, vi, beforeEach, afterEach, type Mock } from 'vitest';
 import VerifierForm from '$lib/verifier/VerifierForm.svelte';
 import TestResult from './DummyResultForTest.svelte';
@@ -282,7 +282,7 @@ describe('VerifierForm Component', () => {
     expect(urlArg).toBe('?game=dice&nonce=0');
   });
 
-  test('invalid option causes to reset to the first option', async () => {
+  test('invalid option causes reset to the first option', async () => {
     await navigateTo(
       new URL('http://localhost:8080/?game=slide&slidehash=123&blockhash=' + SLIDE_SEEDS[1])
     );
@@ -307,11 +307,71 @@ describe('VerifierForm Component', () => {
     expect(urlArg).toContain('blockhash=' + SLIDE_SEEDS[0]);
   });
 
+  describe('field presence check', () => {
+    test('presence check not met when entering form', async () => {
+      await navigateTo(new URL('http://localhost:8080/?game=plinko&nonce=0&risk=norow'));
+
+      const { user } = setupVerifierForm();
+
+      //rows is not present
+      expect(screen.queryByLabelText(/Rows\*/)).not.toBeInTheDocument();
+
+      //set risk to low
+      const risk = screen.getByLabelText(/Risk/);
+      await user.selectOptions(risk, 'low');
+
+      //rows is present and set to default
+      const rows = await screen.findByLabelText(/Rows\*/);
+      expect(rows).toBeInTheDocument();
+      expect(rows).toHaveValue(8);
+    });
+
+    test('presence check not met when interacting with form', async () => {
+      const { user } = setupVerifierForm();
+
+      await navigateTo(new URL('http://localhost:8080/?game=plinko&rows=16'));
+
+      let rows = screen.getByLabelText(/Rows\*/);
+
+      //rows is present
+      expect(rows).toBeInTheDocument();
+      expect(rows).toHaveValue(16);
+
+      //set risk to norow
+      const risk = screen.getByLabelText(/Risk/);
+      await user.selectOptions(risk, 'norow');
+
+      vi.advanceTimersByTime(350);
+
+      //check goto was called
+      const [urlArg] = gotoSpy.mock.lastCall!;
+      expect(urlArg).toContain('game=plinko');
+      expect(urlArg).toContain('risk=norow');
+      expect(urlArg).toContain('nonce=0');
+      expect(urlArg).not.toContain('rows');
+
+      //wait for rows to be not present
+      expect(rows).not.toBeInTheDocument();
+
+      //simulate navigation
+      await navigateTo(new URL('http://localhost:8080/?game=plinko&risk=norow&nonce=0'));
+
+      //set risk to high
+      await user.selectOptions(risk, 'high');
+
+      vi.advanceTimersByTime(350);
+
+      //check goto was called
+      const [urlArg2] = gotoSpy.mock.lastCall!;
+      expect(urlArg2).toContain('game=plinko');
+      expect(urlArg2).toContain('risk=high');
+      expect(urlArg2).toContain('nonce=0');
+      expect(urlArg2).toContain('rows=8');
+    });
+  });
+
   describe('default values set if not provided', () => {
     test('mount hook', async () => {
-      // set initial game
-      await navigateTo(new URL('http://localhost:8080/?game=plinko'));
-
       setupVerifierForm();
 
       // set default values
@@ -356,11 +416,14 @@ describe('VerifierForm Component', () => {
   test('empty params are removed from url', async () => {
     setupVerifierForm();
 
-    await navigateTo(new URL('http://localhost:8080/?game=dice&clientseed='));
+    //trigger first navigation check
+    await navigateTo(new URL('http://localhost:8080/?game=dice&nonce=0'));
 
-    expect(gotoSpy).toHaveBeenCalledOnce();
-    const [urlArg] = gotoSpy.mock.calls[0];
-    expect(urlArg).toBe('?game=dice&nonce=0');
+    //navigate to url having empty param
+    await navigateTo(new URL('http://localhost:8080/?game=dice&clientseed=&nonce=0'));
+
+    //goto will not be called since urls are the same
+    expect(gotoSpy).toHaveBeenCalledTimes(0);
   });
 
   function setupVerifierForm() {
@@ -449,7 +512,7 @@ describe('VerifierForm Component', () => {
           plinko: {
             name: 'plinko',
             schema: CLIENT_SEED_SERVER_SEED_NONCE_SCHEMA.extend({
-              risk: z.enum(['low', 'medium', 'high']),
+              risk: z.enum(['low', 'medium', 'high', 'norow']),
               rows: z.number().min(8).max(16)
             }),
             controls: [
@@ -459,7 +522,7 @@ describe('VerifierForm Component', () => {
                 name: 'risk',
                 label: 'Risk',
                 type: 'select',
-                options: ['low', 'medium', 'high']
+                options: ['low', 'medium', 'high', 'norow']
               },
               {
                 id: 'rows',
@@ -467,6 +530,7 @@ describe('VerifierForm Component', () => {
                 label: 'Rows',
                 type: 'number',
                 required: true,
+                hide: (formValues) => formValues?.risk === 'norow',
                 default: 8,
                 attrs: {
                   min: 8,

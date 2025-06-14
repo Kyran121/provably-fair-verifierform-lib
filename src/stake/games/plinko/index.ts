@@ -9,23 +9,32 @@ import {
 export const gameDefinition: GameDefinition = {
   name: 'Plinko',
   schema: CLIENT_SEED_SERVER_SEED_NONCE_SCHEMA.extend({
-    risk: z.enum(['low', 'medium', 'high']),
-    rows: z.number().min(8).max(16)
+    risk: z.enum(['low', 'medium', 'high', 'norow']),
+    rows: z.number().min(8).max(16).optional()
+  }).superRefine((data, ctx) => {
+    if (data.risk !== 'norow' && data.rows === undefined) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "rows is required when risk is not 'norow'",
+        path: ['rows']
+      });
+    }
   }),
   controls: [
     ...CLIENT_SEED_SERVER_SEED_NONCE_CONTROLS,
     {
       id: 'risk',
       name: 'risk',
-      label: 'Risk',
+      label: 'Game Row',
       type: 'select',
-      options: ['low', 'medium', 'high']
+      options: ['low', 'medium', 'high', 'norow']
     },
     {
       id: 'rows',
       name: 'rows',
-      label: 'Rows',
+      label: 'Row',
       type: 'number',
+      hide: (formValues) => formValues?.risk === 'norow',
       required: true,
       default: 8,
       attrs: {

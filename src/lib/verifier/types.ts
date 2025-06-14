@@ -11,6 +11,7 @@ export interface Control {
   required?: boolean; //defaults to false
   disabled?: boolean; //defaults to false
   syncToUrl?: boolean; //defaults to true
+  hide?: (formValues: Record<string, unknown>) => boolean;
   default?: string | number;
   options?: string[];
   attrs?: Record<string, unknown>;

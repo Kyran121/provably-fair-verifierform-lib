@@ -7,6 +7,7 @@
   import Control from './Control.svelte';
   import { untrack } from 'svelte';
   import { browser } from '$app/environment';
+  import { effectWithPrevious } from '$lib/util/effect-with-previous.svelte';
 
   let { games }: { games: Record<string, GameDefinition> } = $props();
 
@@ -15,12 +16,13 @@
 
   // === Reactive State Setup ===
 
-  let formValues = $state<Record<string, string | number | null>>(
+  let formValues = $state<Record<string, unknown>>(
     Object.fromEntries(browser ? page.url.searchParams.entries() : [])
   );
 
   let game = $derived(formValues.game as string);
-  let controls = $derived(games[game]?.controls);
+  let allControls = $derived(getControls(game));
+  let controls = $derived(getVisibleControls(game, formValues));
   let schema = $derived(games[game]?.schema);
   let Result = $derived(games[game]?.ResultComponent);
   let Explanation = $derived(games[game]?.ExplanationComponent);
@@ -28,21 +30,39 @@
   let firstNavigation = $state(true);
   let showExplanation = $state(false);
 
+  let hiddenControlMap = $derived(getVisibilityMap(allControls, formValues));
+  let hiddenControlState = $derived({ game, hiddenControlMap });
+
   // === Inspections ===
 
   // $inspect(formValues);
 
+  effectWithPrevious(
+    () => hiddenControlState,
+    (prev, curr) => {
+      // no previous state or game changes we ignore
+      if (prev === undefined || prev.game !== curr.game) return;
+      // If the visibility map changes, we need to update the controls
+      // if any control is visible now that was hidden before, we need to ensure
+      // its value is set to a default if it has one, or cleared if it doesn't
+      for (const key in curr.hiddenControlMap) {
+        if (curr.hiddenControlMap[key] && !prev.hiddenControlMap[key]) {
+          // Control is now visible, set default or clear value
+          const control = controlsMap[key];
+          if (control) {
+            formValues[key] = control.default !== undefined ? control.default : null;
+          }
+        } else if (!curr.hiddenControlMap[key] && prev.hiddenControlMap[key]) {
+          // Control is now hidden, clear its value
+          delete formValues[key];
+        }
+      }
+    }
+  );
+
   // === Control Mapping ===
 
-  let controlsMap = $derived(
-    (controls || []).reduce(
-      (acc, control) => {
-        acc[control.id] = control;
-        return acc;
-      },
-      {} as Record<string, TControl>
-    )
-  );
+  let controlsMap = $derived(getControlsMap(allControls));
 
   // === Validation Logic ===
 
@@ -50,7 +70,7 @@
   let validationResult = $derived.by(() => {
     const cleaned = Object.fromEntries(
       Object.entries(formValues)
-        .filter(([, v]) => v !== null && v !== '')
+        .filter(([k, v]) => v !== null && v !== '' && showControl(controlsMap[k], formValues))
         .map(([k, v]) => (controlsMap[k]?.type === 'number' ? [k, parseInt(v as string)] : [k, v]))
     );
     return schema?.safeParse(cleaned);
@@ -71,25 +91,26 @@
 
   // 2. Reactive: update URL when state changes
   $effect(() => {
-    // clear previous delay
-    if (changeTimeout !== undefined) {
-      clearTimeout(changeTimeout);
-    }
-    // check for control change
+    //check for control change
     if (browser && game && game in games && game === page.url.searchParams.get('game')) {
-      // filter to url synced control values
+      //filter to url synced control values
       const urlSyncedValues = Object.entries(formValues).filter(
         ([k, v]) =>
           (controlsMap[k] && 'syncToUrl' in controlsMap[k] ? controlsMap[k].syncToUrl : true) &&
           v !== null
       ) as string[][];
 
-      const qs = new URLSearchParams(urlSyncedValues).toString();
-      if (qs !== page.url.searchParams.toString()) {
+      const searchParams = new URLSearchParams(urlSyncedValues);
+      if (!areSearchParamsEqual(searchParams, page.url.searchParams)) {
         showExplanation = false;
 
-        // delay navigation in case user is still typing
-        changeTimeout = setTimeout(() => shallowNavigate(`?${qs}`), 350);
+        //clear previous delay
+        if (changeTimeout !== undefined) {
+          clearTimeout(changeTimeout);
+        }
+
+        //delay navigation in case user is still typing
+        changeTimeout = setTimeout(() => shallowNavigate(`?${searchParams.toString()}`), 350);
       }
     }
   });
@@ -97,58 +118,57 @@
   // 3. Lifecycle: sync state when URL (navigation) changes
   afterNavigate(() => {
     const game = page.url.searchParams.get('game');
-    const newFormValues: Record<string, string | number | null> = formValues;
-    if (game && game in games) {
-      // check for control changes
-      if (browser) {
-        for (const [key, val] of page.url.searchParams.entries()) {
-          if (key === 'game') continue;
-          if (controlsMap[key]?.type === 'select') {
-            // set to first option if invalid option
-            if (!controlsMap[key].options!.includes(val)) {
-              newFormValues[key] = controlsMap[key].options![0];
-            }
-          } else if (formValues[key] !== val) {
-            newFormValues[key] = controlsMap[key]?.type === 'number' ? parseInt(val) : val;
-          }
-        }
-      }
-      // remove empty/null values
-      for (const key of Object.keys(newFormValues)) {
-        if (
-          !page.url.searchParams.has(key) ||
-          newFormValues[key] === null ||
-          newFormValues[key] === ''
-        ) {
-          delete newFormValues[key];
-        }
-      }
+
+    //if game control is not set or invalid, set to first game
+    if (game === null || !(game in games)) {
+      changeGame(gameIds[0]);
+      return;
     }
-    // mount hook
+
+    //note: afterNavigate() is not a subscriber to signals it refers to
+    const searchParams = page.url.searchParams;
+    const controlsMap = getControlsMap(getControls(game));
+
+    const controlChanges: Record<string, unknown> = { game };
+
+    //if first navigation, set default values for controls having no value
     if (firstNavigation) {
       untrack(() => (firstNavigation = false));
 
-      //if game is invalid, set to first game
-      if (!(game && game in games)) {
-        changeGame(gameIds[0]);
-        return;
-      }
-
-      //set default inputs for game if not set
       for (const key in controlsMap) {
-        if (!(key in newFormValues)) {
+        if (!searchParams.has(key)) {
           if (controlsMap[key].type === 'select') {
-            // set to first option if value is not provided
-            newFormValues[key] = controlsMap[key].options![0];
+            controlChanges[key] = controlsMap[key].options![0];
           } else if ('default' in controlsMap[key] && controlsMap[key].default !== undefined) {
-            // set to default value if value is not provided
-            newFormValues[key] = controlsMap[key].default;
+            controlChanges[key] = controlsMap[key].default;
           }
         }
       }
     }
 
-    formValues = newFormValues;
+    //populate searchParams into control changes
+    for (const [key, val] of searchParams) {
+      //game is set already, skip
+      if (key === 'game') continue;
+
+      //if select option is not valid, set to first option
+      if (controlsMap[key].type === 'select' && !controlsMap[key].options?.includes(val)) {
+        controlChanges[key] = controlsMap[key].options![0];
+      } else {
+        controlChanges[key] = controlsMap[key].type === 'number' ? parseInt(val) : val;
+      }
+    }
+
+    //remove null/empty controls, and hidden controls
+    for (const key of Object.keys(controlChanges)) {
+      if (controlChanges[key] === null || controlChanges[key] === '') {
+        delete controlChanges[key];
+      }
+    }
+
+    if (!shallowEqual(formValues, controlChanges)) {
+      formValues = controlChanges;
+    }
   });
 
   function handleGameChange(event: Event) {
@@ -157,20 +177,62 @@
   }
 
   function changeGame(game: string) {
-    const newFormValues: Record<string, string | number | null> = {};
-    newFormValues.game = game;
+    const controlChanges: Record<string, string | number | null> = {};
+
+    //set new game
+    controlChanges.game = game;
+
+    //set default values for controls
     for (const control of games[game].controls) {
       if (control.type === 'select') {
-        newFormValues[control.id] = control.options![0];
+        controlChanges[control.id] = control.options![0];
       } else if ('default' in control && control.default !== undefined) {
-        newFormValues[control.id] = control.default;
+        controlChanges[control.id] = control.default;
       }
     }
-    formValues = newFormValues;
+
+    formValues = controlChanges;
     showExplanation = false;
 
-    const qs = new URLSearchParams(Object.entries(newFormValues) as string[][]).toString();
+    const qs = new URLSearchParams(Object.entries(controlChanges) as string[][]).toString();
     shallowNavigate(`?${qs}`);
+  }
+
+  function getControls(game: string) {
+    return games[game]?.controls;
+  }
+
+  function getVisibleControls(game: string, formValues: Record<string, unknown>) {
+    return games[game]?.controls.filter((control) => showControl(control, formValues));
+  }
+
+  function getVisibilityMap(
+    controls: TControl[],
+    formValues: Record<string, unknown>
+  ): Record<string, boolean> {
+    return (controls || []).reduce(
+      (acc, control) => {
+        acc[control.id] = showControl(control, formValues);
+        return acc;
+      },
+      {} as Record<string, boolean>
+    );
+  }
+
+  function showControl(control: TControl, formValues: Record<string, unknown>) {
+    return !control || !('hide' in control) || !control?.hide?.(formValues);
+  }
+
+  function getControlsMap<TControl extends { id: string }>(
+    controls: TControl[] | undefined
+  ): Record<string, TControl> {
+    return (controls || []).reduce(
+      (acc, control) => {
+        acc[control.id] = control;
+        return acc;
+      },
+      {} as Record<string, TControl>
+    );
   }
 
   function shallowNavigate(path: string) {
@@ -179,6 +241,41 @@
       keepFocus: true,
       noScroll: true
     });
+  }
+
+  function shallowEqual<T extends Record<string, unknown>>(obj1: T, obj2: T): boolean {
+    if (obj1 === obj2) return true;
+
+    const keys1 = Object.keys(obj1) as (keyof T)[];
+    const keys2 = Object.keys(obj2) as (keyof T)[];
+
+    if (keys1.length !== keys2.length) return false;
+
+    for (const key of keys1) {
+      if (obj1[key] !== obj2[key]) return false;
+    }
+
+    return true;
+  }
+
+  function areSearchParamsEqual(a: URLSearchParams, b: URLSearchParams): boolean {
+    const aEntries = Array.from(a.entries());
+    const bEntries = Array.from(b.entries());
+
+    if (aEntries.length !== bEntries.length) {
+      return false;
+    }
+
+    const aMap = new Map(aEntries);
+    const bMap = new Map(bEntries);
+
+    for (const [key, value] of aMap) {
+      if (bMap.get(key) !== value) {
+        return false;
+      }
+    }
+
+    return true;
   }
 </script>
 
