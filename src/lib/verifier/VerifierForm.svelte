@@ -100,14 +100,14 @@
           v !== null
       ) as string[][];
 
+      //clear previous delay
+      if (changeTimeout !== undefined) {
+        clearTimeout(changeTimeout);
+      }
+
       const searchParams = new URLSearchParams(urlSyncedValues);
       if (!areSearchParamsEqual(searchParams, page.url.searchParams)) {
         showExplanation = false;
-
-        //clear previous delay
-        if (changeTimeout !== undefined) {
-          clearTimeout(changeTimeout);
-        }
 
         //delay navigation in case user is still typing
         changeTimeout = setTimeout(() => shallowNavigate(`?${searchParams.toString()}`), 350);
