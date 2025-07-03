@@ -2,9 +2,9 @@ import type { Control } from '$lib/verifier/types';
 import { render, screen } from '@testing-library/svelte';
 import userEvent from '@testing-library/user-event';
 import { describe, it, expect } from 'vitest';
-import ControlForTest from './ControlForTest.svelte';
+import ControlForTest from './InputForTest.svelte';
 
-describe('Control Component', () => {
+describe('Input Component', () => {
   it('renders a text input when control.type is "text"', async () => {
     const control: Control = {
       id: 'username',

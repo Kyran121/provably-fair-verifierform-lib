@@ -4,7 +4,7 @@
   import { page } from '$app/state';
   import { goto, afterNavigate } from '$app/navigation';
   import type { Control as TControl } from '$lib/verifier/types';
-  import Control from './Control.svelte';
+  import Control from './Input.svelte';
   import { untrack } from 'svelte';
   import { browser } from '$app/environment';
   import { effectWithPrevious } from '$lib/util/effect-with-previous.svelte';
