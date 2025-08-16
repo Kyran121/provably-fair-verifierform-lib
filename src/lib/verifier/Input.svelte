@@ -82,7 +82,7 @@
   {#if control.disabled}
     <label
       for={control.id}
-      class="-z1 absolute top-3 origin-[0] -translate-y-6 scale-90 transform text-sm text-gray-500 dark:text-gray-400"
+      class="-z1 absolute top-3 left-0 origin-[0] -translate-y-6 scale-90 transform text-sm text-gray-500 dark:text-gray-400"
     >
       {control.label} (disabled)
     </label>
@@ -91,7 +91,7 @@
       for={control.id}
       class={[
         'absolute -translate-y-6 scale-90 transform text-sm text-gray-500 duration-300 peer-focus:font-medium dark:text-gray-400',
-        'top-3 -z-10 origin-[0] peer-focus:start-0',
+        'top-3 left-0 -z-10 origin-[0] peer-focus:start-0',
         error && 'peer-focus:text-red-600 peer-focus:dark:text-red-500',
         !error && 'peer-focus:text-purple-500 peer-focus:dark:text-purple-400',
         'peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-100 peer-focus:-translate-y-6 peer-focus:scale-100'
