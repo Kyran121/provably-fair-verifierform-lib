@@ -41,7 +41,7 @@
   "devDependencies": {
     "@eslint/compat": "^1.2.5",
     "@eslint/js": "^9.18.0",
-    "@playwright/test": "^1.49.1",
+    "@playwright/test": "^1.58.2",
     "@stablelib/hex": "^2.0.1",
     "@stablelib/hmac": "^2.0.1",
     "@stablelib/sha256": "^2.0.1",
