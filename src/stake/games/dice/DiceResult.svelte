@@ -9,7 +9,7 @@
   const seed = $derived<StakeSeed>({
     clientSeed: formValues.clientseed as string,
     serverSeed: formValues.serverseed as string,
-    nonce: formValues.nonce as number
+    nonce: formValues.nonce as number,
   });
 
   const rollNumberDebounced = $derived.by(
@@ -30,8 +30,8 @@
   </p>
 {:else}
   <p data-testid="dice-result" class="text-center text-base">
-    you rolled a <span class="text-xl {TEXT_HIGHLIGHT_COLOR}"
-      >{rollNumberDebounced.value!.toFixed(2)}</span
-    >
+    you rolled a <span class="text-xl {TEXT_HIGHLIGHT_COLOR}">
+      {rollNumberDebounced.value!.toFixed(2)}
+    </span>
   </p>
 {/if}

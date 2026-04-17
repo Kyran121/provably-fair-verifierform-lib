@@ -35,9 +35,11 @@
       <p class="mb-2 text-xl">Step {stepNumber}</p>
       <p class="text-base">Extract float based on client seed, server seed, and nonce</p>
       <p class="mb-7 text-sm text-gray-500 dark:text-gray-400">
-        Refer to scripts on the <HighlightLink href="https://stake.com/provably-fair/implementation"
-          >implementation</HighlightLink
+        Refer to scripts on the <HighlightLink
+          href="https://stake.com/provably-fair/implementation"
         >
+          implementation
+        </HighlightLink>
         and
         <HighlightLink href="https://stake.com/provably-fair/conversions">conversion</HighlightLink>
         pages
@@ -78,9 +80,9 @@
         key &nbsp;= <HighlightText>&lbrace;serverseed&rbrace;</HighlightText>
       </p>
       <p class="indent-8">
-        data = <HighlightText
-          >&lbrace;clientseed&rbrace;:&lbrace;nonce&rbrace;:&lbrace;round&rbrace;</HighlightText
-        >
+        data = <HighlightText>
+          &lbrace;clientseed&rbrace;:&lbrace;nonce&rbrace;:&lbrace;round&rbrace;
+        </HighlightText>
       </p>
       <p class="indent-4">)</p>
       <p>= hmac_sha256(</p>
@@ -91,7 +93,9 @@
         data = <HighlightText>{seed.clientSeed}:{seed.nonce}:{round}</HighlightText>
       </p>
       <p class="indent-4">)</p>
-      <p class="break-all">= <span class="text-xs">{hmac}</span></p>
+      <p class="break-all">
+        = <span class="text-xs">{hmac}</span>
+      </p>
 
       <p class="mt-4">hexes</p>
       <p>= substring(</p>
@@ -117,9 +121,10 @@
       </p>
       <p class="indent-4">)</p>
       <p class="break-all">
-        = {hmac.substring(0, cursor)}<HighlightText className="text-base"
-          >{hmac.substring(cursor, cursor + HEX_CHARS_FOR_FLOAT)}</HighlightText
-        ><span class="text-xs text-gray-400">{hmac.substring(cursor + HEX_CHARS_FOR_FLOAT)}</span>
+        = {hmac.substring(0, cursor)}<HighlightText className="text-base">
+          {hmac.substring(cursor, cursor + HEX_CHARS_FOR_FLOAT)}
+        </HighlightText>
+        <span class="text-xs text-gray-400">{hmac.substring(cursor + HEX_CHARS_FOR_FLOAT)}</span>
       </p>
     </ContentBlock>
     <div class="relative mt-4 overflow-x-auto">
@@ -130,8 +135,9 @@
               <th
                 scope="row"
                 class="px-6 py-4 font-medium whitespace-nowrap text-gray-900 dark:text-white"
-                >hex</th
               >
+                hex
+              </th>
               {#each hexes! as hex}
                 <td class="px-6 py-4 font-mono">{hex}</td>
               {/each}
@@ -140,8 +146,9 @@
               <th
                 scope="row"
                 class="px-6 py-4 font-medium whitespace-nowrap text-gray-900 dark:text-white"
-                >byte</th
               >
+                byte
+              </th>
               {#each bytes! as byte}
                 <td class="px-6 py-4 font-mono">{byte}</td>
               {/each}

@@ -6,6 +6,6 @@
     $props();
 </script>
 
-<a class="{TEXT_HIGHLIGHT_COLOR} hover:underline {className}" target="_blank" {href}
-  >{@render children()}</a
->
+<a class="{TEXT_HIGHLIGHT_COLOR} hover:underline {className}" target="_blank" {href}>
+  {@render children()}
+</a>

@@ -89,15 +89,15 @@ export const diceGame: GameDefinition = {
   controls: [
     { id: 'clientseed', name: 'Client Seed', label: 'Client Seed', type: 'text', required: true },
     { id: 'serverseed', name: 'Server Seed', label: 'Server Seed', type: 'text', required: true },
-    { id: 'nonce', name: 'Nonce', label: 'Nonce', type: 'number', required: true }
+    { id: 'nonce', name: 'Nonce', label: 'Nonce', type: 'number', required: true },
   ],
   schema: z.object({
     clientseed: z.string(),
     serverseed: z.string(),
-    nonce: z.coerce.number()
+    nonce: z.coerce.number(),
   }),
   ResultComponent: DiceResult,
-  ExplanationComponent: DiceExplanation
+  ExplanationComponent: DiceExplanation,
 };
 ```
 

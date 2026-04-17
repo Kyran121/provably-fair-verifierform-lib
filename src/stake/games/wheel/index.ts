@@ -1,6 +1,6 @@
 import {
   CLIENT_SEED_SERVER_SEED_NONCE_CONTROLS,
-  CLIENT_SEED_SERVER_SEED_NONCE_SCHEMA
+  CLIENT_SEED_SERVER_SEED_NONCE_SCHEMA,
 } from '../../controlSetup';
 import { z } from 'zod';
 import NoopResult from '../../NoopResult.svelte';
@@ -10,7 +10,7 @@ export const gameDefinition: GameDefinition = {
   name: 'Wheel',
   schema: CLIENT_SEED_SERVER_SEED_NONCE_SCHEMA.extend({
     risk: z.enum(['low', 'medium', 'high']),
-    segments: z.number().min(10).max(50).step(10)
+    segments: z.number().min(10).max(50).step(10),
   }),
   controls: [
     ...CLIENT_SEED_SERVER_SEED_NONCE_CONTROLS,
@@ -19,7 +19,7 @@ export const gameDefinition: GameDefinition = {
       name: 'risk',
       label: 'Risk',
       type: 'select',
-      options: ['low', 'medium', 'high']
+      options: ['low', 'medium', 'high'],
     },
     {
       id: 'segments',
@@ -31,9 +31,9 @@ export const gameDefinition: GameDefinition = {
       attrs: {
         min: 10,
         max: 50,
-        step: 10
-      }
-    }
+        step: 10,
+      },
+    },
   ],
-  ResultComponent: NoopResult
+  ResultComponent: NoopResult,
 };

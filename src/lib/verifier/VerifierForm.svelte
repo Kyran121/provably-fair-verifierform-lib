@@ -239,7 +239,7 @@
     goto(path, {
       replaceState: true,
       keepFocus: true,
-      noScroll: true
+      noScroll: true,
     });
   }
 
@@ -282,17 +282,18 @@
 <div class="mx-auto max-w-xl rounded-b-lg p-4">
   <!-- Game selection dropdown -->
   <div class="mb-7">
-    <label for="game" class="mb-1 block font-semibold text-black dark:text-white"
-      >Select Game:</label
-    >
+    <label for="game" class="mb-1 block font-semibold text-black dark:text-white">
+      Select Game:
+    </label>
     <select
       id="game"
       onchange={handleGameChange}
       class="block w-full border-0 border-b-1 bg-transparent p-2 focus:border-purple-400 focus:ring-0 focus:outline-none dark:text-white"
     >
       {#each Object.entries(games) as [gameId, gameDef] (gameId)}
-        <option value={gameId} {...game === gameId ? { selected: true } : {}}>{gameDef.name}</option
-        >
+        <option value={gameId} {...game === gameId ? { selected: true } : {}}>
+          {gameDef.name}
+        </option>
       {/each}
     </select>
   </div>
@@ -318,7 +319,7 @@
       <button
         class={[
           'm-auto block px-5 py-2.5 text-sm font-medium text-white focus:ring-0 focus:outline-none',
-          'bg-purple-500 hover:bg-purple-600'
+          'bg-purple-500 hover:bg-purple-600',
         ]}
         onclick={() => (showExplanation = !showExplanation)}
       >

@@ -4,7 +4,7 @@ import { z } from 'zod';
 export const CLIENT_SEED_SERVER_SEED_NONCE_SCHEMA = z.object({
   clientseed: z.string(),
   serverseed: z.string(),
-  nonce: z.number().nonnegative()
+  nonce: z.number().nonnegative(),
 });
 
 export const CLIENT_SEED_SERVER_SEED_NONCE_CONTROLS: Control[] = [
@@ -13,14 +13,14 @@ export const CLIENT_SEED_SERVER_SEED_NONCE_CONTROLS: Control[] = [
     name: 'clientseed',
     label: 'Client Seed',
     type: 'text',
-    required: true
+    required: true,
   },
   {
     id: 'serverseed',
     name: 'serverseed',
     label: 'Server Seed',
     type: 'text',
-    required: true
+    required: true,
   },
   {
     id: 'nonce',
@@ -30,7 +30,7 @@ export const CLIENT_SEED_SERVER_SEED_NONCE_CONTROLS: Control[] = [
     required: true,
     default: 0,
     attrs: {
-      min: 0
-    }
-  }
+      min: 0,
+    },
+  },
 ];

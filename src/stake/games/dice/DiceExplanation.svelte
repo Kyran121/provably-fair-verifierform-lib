@@ -10,7 +10,7 @@
   let seed = $derived<StakeSeed>({
     clientSeed: formValues.clientseed as string,
     serverSeed: formValues.serverseed as string,
-    nonce: formValues.nonce as number
+    nonce: formValues.nonce as number,
   });
 
   const floatDebounced = $derived.by(

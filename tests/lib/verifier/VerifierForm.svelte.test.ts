@@ -9,20 +9,20 @@ import { tick } from 'svelte';
 import { z } from 'zod';
 import {
   CLIENT_SEED_SERVER_SEED_NONCE_CONTROLS,
-  CLIENT_SEED_SERVER_SEED_NONCE_SCHEMA
+  CLIENT_SEED_SERVER_SEED_NONCE_SCHEMA,
 } from '../../../src/stake/controlSetup';
 
 const CRASH_SEED = '0000000000000000001b34dc6a1e86083f95500b096231436e9b25cbdd0075c4';
 const SLIDE_SEEDS = [
   '0000000000000000000b20f796f5421cac95c4efb06c6bbf6408d6f9b5d7b9dc',
-  '00000000000000000000644330e1340fc6e894a95c37060bdd180ed11d068944'
+  '00000000000000000000644330e1340fc6e894a95c37060bdd180ed11d068944',
 ];
 
 // Use vi.hoisted to define variables accessible in the mock factory
 const {
   gotoSpy,
   afterNavigateCallbackRef,
-  pageStateRef
+  pageStateRef,
 }: {
   gotoSpy: Mock;
   afterNavigateCallbackRef: {
@@ -35,7 +35,7 @@ const {
   return {
     gotoSpy: vi.fn(),
     afterNavigateCallbackRef: { current: null },
-    pageStateRef: { current: { url: null } }
+    pageStateRef: { current: { url: null } },
   };
 });
 
@@ -44,13 +44,13 @@ vi.mock('$app/navigation', () => ({
   goto: gotoSpy,
   afterNavigate: (fn: (navigation: AfterNavigate) => void) => {
     afterNavigateCallbackRef.current = fn;
-  }
+  },
 }));
 
 // Mock $app/state
 vi.mock('$app/state', () => {
   const page = {
-    url: new URL('http://localhost:8080/?game=dice&clientseed=123&serverseed=456&nonce=0')
+    url: new URL('http://localhost:8080/?game=dice&clientseed=123&serverseed=456&nonce=0'),
   };
   pageStateRef.current = page;
   return { page };
@@ -441,17 +441,17 @@ describe('VerifierForm Component', () => {
                 name: 'optional',
                 label: 'Optional',
                 type: 'text',
-                required: false
-              }
+                required: false,
+              },
             ],
             ResultComponent: TestResult,
-            ExplanationComponent: TestExplanation
+            ExplanationComponent: TestExplanation,
           },
           crash: {
             name: 'Crash',
             schema: z.object({
               gamehash: z.string(),
-              blockhash: z.string()
+              blockhash: z.string(),
             }),
             controls: [
               {
@@ -459,7 +459,7 @@ describe('VerifierForm Component', () => {
                 name: 'gamehash',
                 label: 'Game Hash',
                 type: 'text',
-                required: true
+                required: true,
               },
               {
                 id: 'blockhash',
@@ -469,18 +469,18 @@ describe('VerifierForm Component', () => {
                 disabled: true,
                 syncToUrl: false,
                 attrs: {
-                  value: CRASH_SEED
-                }
-              }
+                  value: CRASH_SEED,
+                },
+              },
             ],
             ResultComponent: TestResult,
-            ExplanationComponent: TestExplanation
+            ExplanationComponent: TestExplanation,
           },
           slide: {
             name: 'Slide',
             schema: z.object({
               slidehash: z.string(),
-              blockhash: z.string()
+              blockhash: z.string(),
             }),
             controls: [
               {
@@ -488,7 +488,7 @@ describe('VerifierForm Component', () => {
                 name: 'slidehash',
                 label: 'Slide Hash',
                 type: 'text',
-                required: true
+                required: true,
               },
               {
                 id: 'blockhash',
@@ -496,24 +496,24 @@ describe('VerifierForm Component', () => {
                 label: 'Block Hash',
                 type: 'select',
                 syncToUrl: true,
-                options: SLIDE_SEEDS
-              }
+                options: SLIDE_SEEDS,
+              },
             ],
             ResultComponent: TestResult,
-            ExplanationComponent: TestExplanation
+            ExplanationComponent: TestExplanation,
           },
           roulette: {
             name: 'roulette',
             schema: CLIENT_SEED_SERVER_SEED_NONCE_SCHEMA,
             controls: CLIENT_SEED_SERVER_SEED_NONCE_CONTROLS,
             ResultComponent: TestResult,
-            ExplanationComponent: TestExplanation
+            ExplanationComponent: TestExplanation,
           },
           plinko: {
             name: 'plinko',
             schema: CLIENT_SEED_SERVER_SEED_NONCE_SCHEMA.extend({
               risk: z.enum(['low', 'medium', 'high', 'norow']),
-              rows: z.number().min(8).max(16)
+              rows: z.number().min(8).max(16),
             }),
             controls: [
               ...CLIENT_SEED_SERVER_SEED_NONCE_CONTROLS,
@@ -522,7 +522,7 @@ describe('VerifierForm Component', () => {
                 name: 'risk',
                 label: 'Risk',
                 type: 'select',
-                options: ['low', 'medium', 'high', 'norow']
+                options: ['low', 'medium', 'high', 'norow'],
               },
               {
                 id: 'rows',
@@ -534,15 +534,15 @@ describe('VerifierForm Component', () => {
                 default: 8,
                 attrs: {
                   min: 8,
-                  max: 16
-                }
-              }
+                  max: 16,
+                },
+              },
             ],
             ResultComponent: TestResult,
-            ExplanationComponent: TestExplanation
-          }
-        }
-      }
+            ExplanationComponent: TestExplanation,
+          },
+        },
+      },
     });
     return { user };
   }
@@ -556,16 +556,16 @@ describe('VerifierForm Component', () => {
       from: {
         url: new URL('http://localhost:8080/?game=dice&clientseed=123&serverseed=456'),
         route: { id: null },
-        params: null
+        params: null,
       },
       to: {
         url: newUrl,
         route: { id: null },
-        params: null
+        params: null,
       },
       willUnload: false,
       type: 'link',
-      complete: Promise.resolve()
+      complete: Promise.resolve(),
     });
 
     await tick();

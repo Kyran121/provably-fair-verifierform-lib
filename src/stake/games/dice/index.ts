@@ -2,7 +2,7 @@ import DiceResult from './DiceResult.svelte';
 import DiceExplanation from './DiceExplanation.svelte';
 import {
   CLIENT_SEED_SERVER_SEED_NONCE_CONTROLS,
-  CLIENT_SEED_SERVER_SEED_NONCE_SCHEMA
+  CLIENT_SEED_SERVER_SEED_NONCE_SCHEMA,
 } from '../../controlSetup';
 import type { GameDefinition } from '$lib';
 
@@ -11,5 +11,5 @@ export const gameDefinition: GameDefinition = {
   schema: CLIENT_SEED_SERVER_SEED_NONCE_SCHEMA,
   controls: CLIENT_SEED_SERVER_SEED_NONCE_CONTROLS,
   ResultComponent: DiceResult,
-  ExplanationComponent: DiceExplanation
+  ExplanationComponent: DiceExplanation,
 };

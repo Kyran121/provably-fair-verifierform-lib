@@ -3,20 +3,20 @@ import { z } from 'zod';
 import NoopResult from '../../NoopResult.svelte';
 import {
   CLIENT_SEED_SERVER_SEED_NONCE_CONTROLS,
-  CLIENT_SEED_SERVER_SEED_NONCE_SCHEMA
+  CLIENT_SEED_SERVER_SEED_NONCE_SCHEMA,
 } from '../../controlSetup';
 
 export const gameDefinition: GameDefinition = {
   name: 'Plinko',
   schema: CLIENT_SEED_SERVER_SEED_NONCE_SCHEMA.extend({
     risk: z.enum(['low', 'medium', 'high', 'norow']),
-    rows: z.number().min(8).max(16).optional()
+    rows: z.number().min(8).max(16).optional(),
   }).superRefine((data, ctx) => {
     if (data.risk !== 'norow' && data.rows === undefined) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         message: "rows is required when risk is not 'norow'",
-        path: ['rows']
+        path: ['rows'],
       });
     }
   }),
@@ -27,7 +27,7 @@ export const gameDefinition: GameDefinition = {
       name: 'risk',
       label: 'Game Row',
       type: 'select',
-      options: ['low', 'medium', 'high', 'norow']
+      options: ['low', 'medium', 'high', 'norow'],
     },
     {
       id: 'rows',
@@ -39,9 +39,9 @@ export const gameDefinition: GameDefinition = {
       default: 8,
       attrs: {
         min: 8,
-        max: 16
-      }
-    }
+        max: 16,
+      },
+    },
   ],
-  ResultComponent: NoopResult
+  ResultComponent: NoopResult,
 };

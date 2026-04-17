@@ -12,7 +12,7 @@ describe('Input Component', () => {
       label: 'Username',
       type: 'text',
       required: true,
-      attrs: { placeholder: 'Enter username' }
+      attrs: { placeholder: 'Enter username' },
     };
 
     const user = userEvent.setup();
@@ -35,7 +35,7 @@ describe('Input Component', () => {
       label: 'Username',
       type: 'text',
       required: true,
-      attrs: { placeholder: 'Enter username' }
+      attrs: { placeholder: 'Enter username' },
     };
 
     const user = userEvent.setup();
@@ -60,7 +60,7 @@ describe('Input Component', () => {
       type: 'text',
       disabled: true,
       syncToUrl: true,
-      attrs: { placeholder: 'Enter username' }
+      attrs: { placeholder: 'Enter username' },
     };
 
     render(ControlForTest, { props: { control } });
@@ -77,7 +77,7 @@ describe('Input Component', () => {
       label: 'Age',
       type: 'number',
       required: false,
-      attrs: { min: 0, max: 120 }
+      attrs: { min: 0, max: 120 },
     };
 
     const user = userEvent.setup();
@@ -102,7 +102,7 @@ describe('Input Component', () => {
       label: 'Country',
       type: 'select',
       required: true,
-      options: ['uk', 'us']
+      options: ['uk', 'us'],
     };
 
     const user = userEvent.setup();
@@ -128,7 +128,7 @@ describe('Input Component', () => {
       label: 'Country',
       type: 'select',
       disabled: true,
-      options: ['uk', 'us']
+      options: ['uk', 'us'],
     };
 
     render(ControlForTest, { props: { control, value: 'uk' } });

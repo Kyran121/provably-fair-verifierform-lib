@@ -11,7 +11,7 @@
     plinko: plinkoGameDefinition,
     slide: slideGameDefinition,
     crash: crashGameDefinition,
-    wheel: wheelGameDefinition
+    wheel: wheelGameDefinition,
   };
 </script>
 

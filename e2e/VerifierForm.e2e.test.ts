@@ -12,7 +12,7 @@ test.describe('VerifierForm E2E Tests', () => {
     const formulas = [
       'floor(0.930725325830 * 10001) / 100 = 93.08',
       'floor(0.006185348844 * 10001) / 100 = 0.61',
-      'floor(0.717253545532 * 10001) / 100 = 71.73'
+      'floor(0.717253545532 * 10001) / 100 = 71.73',
     ];
 
     const game = page.getByLabel('Select Game:');
